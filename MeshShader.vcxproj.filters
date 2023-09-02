@@ -305,6 +305,9 @@
     <ClInclude Include="include\D3D12FrameWork\ModelLoader.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="include\D3D12FrameWork\util\wcharUtil.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="External\clipBoard.txt" />
@@ -315,5 +318,6 @@
   <ItemGroup>
     <FxCompile Include="shader\triangle\triangleVS.hlsl" />
     <FxCompile Include="shader\triangle\trianglePS.hlsl" />
+    <FxCompile Include="shader\mesh\SimpleMS.hlsl" />
   </ItemGroup>
 </Project>

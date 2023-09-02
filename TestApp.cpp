@@ -75,7 +75,7 @@ namespace D3D12FrameWork {
 	}
 
 	bool TestApp::Init() {
-		if (!ShaderCompiler::Create(ShaderCompiler::ShaderCompilerType::FXC)) {
+		if (!ShaderCompiler::Create(ShaderCompiler::ShaderCompilerType::DXC)) {
 			return false;
 		}
 		if (!InitWindow()) {
@@ -323,9 +323,9 @@ namespace D3D12FrameWork {
 		);
 		auto vertices = std::span<BasicVertex>();
 		auto indices = std::span<unsigned short>();
-		ModelLoader<BasicVertex>::Load(
-			"res/model/ac_guitar.fbx", vertices, indices
-		);
+		//ModelLoader<BasicVertex>::Load(
+		//	"res/model/ac_guitar.fbx", vertices, indices
+		//);
 
 
 		m_renderComponent->CreateMeshSet("test_mesh");

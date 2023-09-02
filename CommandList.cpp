@@ -164,7 +164,7 @@ namespace D3D12FrameWork {
 		auto const matSize = _pRc->Material(0)->Size();
 		for (int i = 0; i < matSize; i++) {
 			auto const& matView = _pRc->Material(0)->GetView(i);
-			//rootparameterにコピー
+			//rootparameterにコピー.isLayoutStableはglobalheapchankの場所が変わっているかを表すけどいるのか？
 			isLayoutStable = isLayoutStable && m_rpHeap->CopyToHeapChank(_pDev,
 				matView.GetCopyDesc(),
 				i,
@@ -172,9 +172,7 @@ namespace D3D12FrameWork {
 			);
 		}
 		//rootparameterのセット
-		if (!isLayoutStable) {
-			SetGlobalDescriptorHeap();
-		}
+		SetGlobalDescriptorHeap();
 
 		//本当なら入る描画処理
 		m_pCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

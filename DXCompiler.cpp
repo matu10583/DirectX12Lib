@@ -2,17 +2,36 @@
 #include <fstream>
 #include <list>
 #include <vector>
+#include <ranges>
+#include <string_view>
 #include "D3D12FrameWork/ShaderBlob.h"
 #include "D3D12FrameWork/Common.h"
 #include "D3D12FrameWork/File.h"
+#include "D3D12FrameWork/util/wcharUtil.h"
+#include "dxc/DxilContainer/DxilContainer.h"
 
+
+namespace {
+	bool CheckErrorBlob(IDxcBlob* _errBlob) {
+		if (_errBlob->GetBufferSize() == 0) return true;
+#if defined(DEBUG) || defined(_DEBUG)
+		std::string errstr;
+		errstr.resize(_errBlob->GetBufferSize());
+		std::copy_n((char*)_errBlob->GetBufferPointer(),
+			_errBlob->GetBufferSize(),
+			errstr.begin());
+		OutputDebugStringA(errstr.c_str());
+#endif // define
+		return false;
+	}
+}
 
 namespace D3D12FrameWork{
 	const std::map<ShaderCompileOption, std::tuple<LPCWSTR, UINT>>
 		CompileOptionTable =
 	{
 		{ShaderCompileOption::SHADERCOMPILE_DEBUG,
-			{L"-Zi", D3DCOMPILE_DEBUG}},
+			{L"-Zi -Qembed_debug -WX -Zss", D3DCOMPILE_DEBUG}},
 		{ShaderCompileOption::SHADERCOMPILE_SKIP_VALIDATION,
 			{L"-Vd", D3DCOMPILE_SKIP_VALIDATION}},
 		{ShaderCompileOption::SHADERCOMPILE_SKIP_OPTIMIZATION,
@@ -96,8 +115,6 @@ namespace D3D12FrameWork{
 		RETURNIFFAILED(hr);*/
 		hr = ::DxcCreateInstance(CLSID_DxcContainerReflection, IID_PPV_ARGS(&m_pContainerRefl));
 		RETURNIFFAILED(hr);
-		hr = ::DxcCreateInstance(CLSID_DxcLibrary, IID_PPV_ARGS(&m_pLib));
-		RETURNIFFAILED(hr);
 
 		return true;
 	}
@@ -112,34 +129,24 @@ namespace D3D12FrameWork{
 		ID3D12ShaderReflection** _ppRflc,
 		bool isPreCompiled
 	) {
-		IDxcBlob* compiledShaderBlob{};
+		
+		ComPtr<IDxcResult> compiledBuff{};
+		//shader情報とreflが入るはず
+		IDxcBlobEncoding* pcompiledShaderObj{};
 		//シェーダーコンパイルとリフレクション取得
 		if (isPreCompiled) {
-			ID3DBlob* compiledRes{};
-			auto hr = D3DReadFileToBlob(_compiledPath.c_str(), &compiledRes);
+			//.csoを読んでくる
+			File csoFile;
+			csoFile.ReadFile(_compiledPath, true);
+			auto hr = m_pUtils->CreateBlob(csoFile.GetData(), csoFile.GetSize(), DXC_CP_ACP,
+				&pcompiledShaderObj);
 			if (FAILED(hr)) {
 				assert(false);
-				compiledRes->Release();
-				compiledRes = nullptr;
 				return false;
 			}
-			*_ppShader = new BlobObject<ID3DBlob>(compiledRes);
-			if (_ppRflc != nullptr) {
-				hr = D3DReflect(compiledRes->GetBufferPointer(),
-					compiledRes->GetBufferSize(),
-					IID_PPV_ARGS(_ppRflc));
-
-				if (FAILED(hr)) {
-					assert(false);
-					compiledRes->Release();
-					compiledRes = nullptr;
-					return false;
-				}
-			}
-
-			
 		}
 		else {
+			//shaderコードの読み込み
 			ComPtr<IDxcBlobEncoding> sourceBlob{};
 			auto hr = m_pUtils->LoadFile(_shaderPath.c_str(), nullptr,
 				sourceBlob.ReleaseAndGetAddressOf());
@@ -151,47 +158,147 @@ namespace D3D12FrameWork{
 			};
 
 			//set compiler option
-			std::vector<LPCWSTR> cmpArgs = GetDxcArguments(_compileOption);
-			cmpArgs.emplace_back(L"-E");
-			cmpArgs.emplace_back(StrToWStr(_entryPoint).c_str());
-			cmpArgs.emplace_back(L"-T");
-			cmpArgs.emplace_back(StrToWStr(_shaderVersion).c_str());
+			constexpr int MaxWCharSize = 30;
+			auto entryPSize = GetWCharBuffSizeFromChar(_entryPoint);
+			if (MaxWCharSize < entryPSize) {
+				std::stringstream oss;
+				oss << "Shaderのエントリポイント名は" << MaxWCharSize << "文字以下にしてください！";
+				throw new std::length_error(oss.str());
+			}
+			wchar_t entryPoint[MaxWCharSize];
+			if (!StrToWStr(_entryPoint, entryPoint, MaxWCharSize)) assert(false);
+			std::wstring_view wEP(entryPoint, entryPSize);
 
-			ComPtr<IDxcResult> compiledBuff{};
+			auto shaderVSize = GetWCharBuffSizeFromChar(_shaderVersion);
+			if (MaxWCharSize < shaderVSize) {
+				std::stringstream oss;
+				oss << "Shaderのバージョン名は" << MaxWCharSize << "文字以下じゃないの？";
+				throw new std::length_error(oss.str());
+			}
+			wchar_t shaderVersion[MaxWCharSize];
+			if (!StrToWStr(_shaderVersion, shaderVersion, MaxWCharSize)) assert(false);
+			std::wstring_view wSV(shaderVersion, shaderVSize);
+
+			auto shader_dir = std::filesystem::canonical(
+				_shaderPath.parent_path());
+			LPCWSTR constArgs[] = {
+				L"-I",
+				shader_dir.c_str()
+			};
+
+			ComPtr<IDxcCompilerArgs> pCmpArgs{};
+			hr = m_pUtils->BuildArguments(
+				_shaderPath.c_str(),
+				wEP.data(),
+				wSV.data(),
+				constArgs,
+				ARRAYSIZE(constArgs),
+				nullptr,
+				0,
+				pCmpArgs.ReleaseAndGetAddressOf()
+			);
+
+			//指定されたコンパイルオプションを漬ける。
+			PushBackDxcArguments(_compileOption.data(), _compileOption.size(), pCmpArgs.Get());
+
+			//filesystemからinclude
+			ComPtr<IDxcIncludeHandler> defaultInc;
+			hr = m_pUtils->CreateDefaultIncludeHandler(defaultInc.ReleaseAndGetAddressOf());
+			if (FAILED(hr)) {
+				assert(false);
+				return false;
+			}
+
 			hr = m_pCompiler->Compile(
 				&srcBuff,
-				cmpArgs.data(),
-				static_cast<uint32_t>(cmpArgs.size()),
-				nullptr,
+				pCmpArgs->GetArguments(),
+				pCmpArgs->GetCount(),
+				defaultInc.Get(),
 				IID_PPV_ARGS(compiledBuff.ReleaseAndGetAddressOf())
 			);
+
 			if (FAILED(hr)) {
 				assert(false);
 				return false;
 			}
-			hr = compiledBuff->GetResult(&compiledShaderBlob);
+
+			ComPtr<IDxcBlobUtf16> outputName{};
+			ComPtr<IDxcBlob> errBlob{};
+			hr = compiledBuff->GetOutput(DXC_OUT_ERRORS, 
+				IID_PPV_ARGS(errBlob.ReleaseAndGetAddressOf()),
+				outputName.ReleaseAndGetAddressOf());
+			if (FAILED(hr) ||
+				!CheckErrorBlob(errBlob.Get())) {
+				assert(false);
+				return false;
+			}		
+
+			//コンパイルした結果を取得
+			ComPtr<IDxcBlob> compiledShaderBlob{};
+			hr = compiledBuff->GetResult(compiledShaderBlob.ReleaseAndGetAddressOf());
 			if (FAILED(hr)) {
 				assert(false);
-				compiledShaderBlob->Release();
-				compiledShaderBlob = nullptr;
 				return false;
 			}
+
+#if defined(DEBUG) | defined(_DEBUG)
+			hr = m_pContainerRefl->Load(compiledShaderBlob.Get());
+			//pdb名を取得
+			UINT32 debugNameIndex;
+			hr = m_pContainerRefl->FindFirstPartKind(hlsl::DFCC_ShaderDebugName, &debugNameIndex);
+			ComPtr<IDxcBlob> pPdbName;
+			hr = m_pContainerRefl->GetPartContent(debugNameIndex, pPdbName.ReleaseAndGetAddressOf());
+			//デバッグ情報の取得
+			UINT32 debugInfoIndex;
+			hr = m_pContainerRefl->FindFirstPartKind(hlsl::DFCC_ShaderDebugInfoDXIL, &debugInfoIndex);
+			ComPtr<IDxcBlob> pPdb;
+			hr = m_pContainerRefl->GetPartContent(debugInfoIndex, pPdb.ReleaseAndGetAddressOf());
+			//pdbファイル名の変換
+			auto pDebugNameData = reinterpret_cast<hlsl::DxilShaderDebugName const*>(
+				pPdbName->GetBufferPointer());
+			auto pName = reinterpret_cast<char const*>(pDebugNameData + 1);
+			
 			//ファイルセーブ処理
-			if (!File::WriteFile(_compiledPath, compiledShaderBlob->GetBufferSize(),
-				reinterpret_cast<uint8_t*>(compiledShaderBlob->GetBufferPointer()))) {
+			//auto pdbShaderPath = DX12Settings::SHADER_PDB_PATH / _shaderPath.filename();
+			//if (!std::filesystem::exists(pdbShaderPath)) {
+			//	std::filesystem::create_directory(pdbShaderPath);
+			//}
+			if (!File::WriteFile(DX12Settings::SHADER_PDB_PATH / pName, pPdb->GetBufferSize(),
+				reinterpret_cast<uint8_t*>(pPdb->GetBufferPointer()))) {
+				printf("%sのpdbの保存に失敗しました．", _shaderPath.string().c_str());
+			}
+#endif
+
+
+			//pdbを除いた情報を生成
+			ComPtr<IDxcContainerBuilder> pDxcContainerBuilder;
+			::DxcCreateInstance(CLSID_DxcContainerBuilder,
+				IID_PPV_ARGS(pDxcContainerBuilder.ReleaseAndGetAddressOf()));
+			pDxcContainerBuilder->Load(compiledShaderBlob.Get());
+#if defined(NDEBUG)
+			pDxcContainerBuilder->RemovePart(hlsl::DFCC_ShaderDebugInfoDXIL);
+#endif // !defined(_DEBUG)|| defined(DEBUG)
+			ComPtr<IDxcOperationResult> pstrippedResult;
+			pDxcContainerBuilder->SerializeContainer(pstrippedResult.ReleaseAndGetAddressOf());
+			pstrippedResult->GetResult((IDxcBlob**)&pcompiledShaderObj);
+			//ファイルセーブ処理
+			if (!File::WriteFile(_compiledPath, pcompiledShaderObj->GetBufferSize(),
+				reinterpret_cast<uint8_t*>(pcompiledShaderObj->GetBufferPointer()))) {
 				printf("%sのコンパイルデータの保存に失敗しました．", _shaderPath.string().c_str());
 			}
-			
-		}
 
-		*_ppShader= new BlobObject<IDxcBlob>(compiledShaderBlob);
+			
+		}//end precompiled
+
 		//shader reflectionの取得
 		if (_ppRflc != nullptr) {
-			auto hr = m_pContainerRefl->Load(compiledShaderBlob);
+			auto hr = m_pContainerRefl->Load(pcompiledShaderObj);
 			if (FAILED(hr)) {
 				assert(false);
 				return false;
 			}
+
+
 			UINT shdIdx = 0;
 			hr = m_pContainerRefl->FindFirstPartKind(DXC_PART_DXIL, &shdIdx);
 			if (FAILED(hr)) {
@@ -206,25 +313,40 @@ namespace D3D12FrameWork{
 			}
 		}
 		
+		//shader情報を返す
+		*_ppShader = new BlobObject<IDxcBlobEncoding>(pcompiledShaderObj);
+		
 		return true;
 	}
 	
-	std::vector<LPCWSTR>
-		DXCompiler::GetDxcArguments(std::vector<ShaderCompileOption>const& _opts) {
-		std::vector<LPCWSTR> ret;
-		ret.clear();
-		for (int i = 0; i < _opts.size(); i++) {
+	void
+		DXCompiler::PushBackDxcArguments(ShaderCompileOption const* _opts, size_t optSize, 
+			IDxcCompilerArgs* _cargs) {
+		for (int i = 0; i < optSize; i++) {
 			LPCWSTR o = std::get<ShaderCompiler::ShaderCompilerType::DXC>(
 				CompileOptionTable.at(_opts[i]));
-			ret.emplace_back(o);
+			auto vo = std::wstring_view(o);
+			if (vo.find_first_of(L" ") == std::wstring_view::npos) {
+				LPCWSTR tmpptrs[] = { vo.data() };
+				_cargs->AddArguments(tmpptrs, 1);
+				continue;
+			}
+			for (auto const& arg : std::views::split(vo, L' ')) {
+				//newしたくないけどなんか静的確保で多めにとっても無理なので
+				//まあコンパイルなんてほぼ実行時には行われないしいいでしょ
+				auto argChr = new WCHAR[arg.size() + 1];
+				std::memcpy(reinterpret_cast<void*>(argChr),
+					reinterpret_cast<void const*>(arg.data()),
+					arg.size()*sizeof(WCHAR));
+				argChr[arg.size()] = L'\0';
+				_cargs->AddArguments((LPCWSTR*)(&argChr), 1);
+				delete[] argChr;
+			}
 		}
-		return ret;
+		return;
 	}
 
 	void DXCompiler::Term() {
-		//SAFERELEASE(m_pIncHandler);
-		SAFERELEASE(m_pCompiler);
-		SAFERELEASE(m_pUtils);
 	}
 
 	bool FXCompiler::Init() {

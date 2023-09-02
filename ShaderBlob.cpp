@@ -21,7 +21,7 @@ namespace D3D12FrameWork {
 		std::wstring_view _shaderName,
 		ShaderType _type,
 		ID3D12ShaderReflection** _ppRflc,
-		ShaderVersion _version
+		DX12Settings::ShaderVersion _version
 	) {
 		m_pShaderFileChecker.reset(new ShaderFileChecker(std::wstring(
 			_shaderName.begin(), _shaderName.end()
@@ -56,8 +56,11 @@ namespace D3D12FrameWork {
 		std::string version;
 		switch (_version)
 		{
-		case D3D12FrameWork::ShaderBlob::VERSION_5_0:
+		case D3D12FrameWork::DX12Settings::VERSION_5_0:
 			version = "5_0";
+			break;
+		case D3D12FrameWork::DX12Settings::VERSION_6_5:
+			version = "6_5";
 			break;
 		default:
 			break;
@@ -83,10 +86,10 @@ namespace D3D12FrameWork {
 	ShaderFileChecker::ShaderFileChecker(std::wstring _shaderName)
 	{
 		m_shaderPath = std::filesystem::path(
-			DX12Settings::SHADER_PATH + _shaderName+L".hlsl"
+			DX12Settings::SHADER_PATH / (_shaderName + L".hlsl")
 		);
 		m_compiledPath = std::filesystem::path(
-			DX12Settings::SHADER_PATH + _shaderName+L".cso"
+			DX12Settings::SHADER_PATH / (_shaderName + L".cso")
 		);
 	}
 
@@ -105,23 +108,29 @@ namespace D3D12FrameWork {
 		}
 		auto comDate = std::filesystem::last_write_time(m_compiledPath).time_since_epoch();
 		auto shdDate = std::filesystem::last_write_time(m_shaderPath).time_since_epoch();
-		if (comDate > shdDate) {//shaderの更新日時より後にコンパイルしている．
-			//hlsliも調べておく
-			auto includePaths = CollectIncludePath();
-			for (auto ipath : includePaths) {
-				auto incShader = m_shaderPath.parent_path().append(ipath);
-				if (!std::filesystem::exists(incShader)) {
-					assert(false);
-				}
-				auto incDate = std::filesystem::last_write_time(incShader).time_since_epoch();
-				if (comDate > incDate) {
-					return true;
-				}
+		if (comDate < shdDate) {//shaderの更新日時より前にコンパイルしている．
+			return false;
+		}
+		//hlsliも調べておく
+		auto includePaths = CollectIncludePath();
+		for (auto ipath : includePaths) {
+			auto incShader = m_shaderPath.parent_path().append(ipath);
+			if (!std::filesystem::exists(incShader)) {
+				assert(false);
+			}
+			auto incDate = std::filesystem::last_write_time(incShader).time_since_epoch();
+			if (comDate < incDate) {
+				return false;
 			}
 		}
+		//pdbも調べておく。
+		//auto pdbPath = DX12Settings::SHADER_PDB_PATH / m_shaderPath.filename();
+		//if (!std::filesystem::exists(pdbPath)) {
+		//	return false;
+		//}
 		
 #endif // DEBUG
-		return false;
+		return true;
 	}
 
 	std::list<std::string> 
