@@ -10,6 +10,7 @@
 #include <vector>
 #include <d3d12shader.h>
 #include "D3D12FrameWork/ShaderBindInfo.h"
+#include "D3D12FrameWork/DX12Settings.h"
 
 //#pragma comment(lib, "d3dcompiler.lib")
 //#pragma comment(lib, "dxguid.lib")
@@ -33,6 +34,7 @@ namespace D3D12FrameWork {
 		}
 		virtual SIZE_T GetBufferSize()const override { return m_pBlob->GetBufferSize(); }
 		virtual LPVOID GetBufferPointer()const override { return m_pBlob->GetBufferPointer(); }
+
 	private:
 		T* m_pBlob;
 	};
@@ -71,16 +73,13 @@ namespace D3D12FrameWork {
 			COMPUTE = 1 << 2,
 			GEOMETRY = 1 << 3,
 		};
-		enum ShaderVersion
-		{
-			VERSION_5_0
-		};
+
 
 		ShaderBlob();
 		~ShaderBlob();
 		bool Init(std::wstring_view _shaderName, ShaderType _type, 
 			ID3D12ShaderReflection** _ppRflc=nullptr,
-			ShaderVersion _version=VERSION_5_0);
+			DX12Settings::ShaderVersion _version= DX12Settings::SHADER_VERSION);
 
 		
 

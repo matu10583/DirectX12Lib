@@ -1,6 +1,7 @@
 #pragma once
 #include <stdio.h>
 #include <string>
+#include <sstream>
 #include <tchar.h>
 #include <Windows.h>
 #include <errno.h>
@@ -106,16 +107,4 @@ fprintf(stderr,"[ERROR] (%s:%d: errno: %s) " M "\n", __FILE__, __LINE__, \
 	T& operator=(T&&)noexcept=default;
 
 
-	inline std::wstring StrToWStr(std::string_view _str) {
-		int buffSize = MultiByteToWideChar(CP_ACP, 0, _str.data(),
-			-1, NULL, 0);
-		wchar_t* wstrBuff = new wchar_t[buffSize];
-
-		MultiByteToWideChar(CP_ACP, 0, _str.data(), -1, wstrBuff, buffSize);
-
-		std::wstring ret(wstrBuff, wstrBuff + buffSize - 1);
-		delete[] wstrBuff;
-
-		return ret;
-	}
 }

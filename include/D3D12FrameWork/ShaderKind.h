@@ -31,8 +31,7 @@ namespace D3D12FrameWork {
 			if (!m_shader.Init(
 				_shaderName,
 				T,
-				pRflc.ReleaseAndGetAddressOf(),
-				ShaderBlob::ShaderVersion::VERSION_5_0
+				pRflc.ReleaseAndGetAddressOf()
 			)) {
 				assert(false);
 				return false;

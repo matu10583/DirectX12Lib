@@ -19,6 +19,9 @@ namespace D3D12FrameWork {
 		void Term();
 
 		GETTERPTR(uint8_t, Data, m_pData.get());
+		auto GetSize() const{
+			return m_size;
+		}
 
 		static bool WriteFile(std::filesystem::path const& _filePath, size_t _size,
 			uint8_t* _pData, bool isBin=true, bool isAdd=false);

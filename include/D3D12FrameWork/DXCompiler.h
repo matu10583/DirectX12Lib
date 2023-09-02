@@ -1,7 +1,7 @@
 #pragma once
 #include <d3d12shader.h>
-#include <dxcapi.h>
 #include <d3dcompiler.h>
+#include "dxc/dxcapi.h"
 #include "D3D12FrameWork/Common.h"
 #include "D3D12FrameWork/ComPtr.h"
 #include <tuple>
@@ -72,7 +72,6 @@ namespace D3D12FrameWork {
 	};
 
 
-	//よくわからん．使うな
 	class DXCompiler: public ShaderCompiler
 	{
 		friend class ShaderCompiler;
@@ -99,10 +98,10 @@ namespace D3D12FrameWork {
 		ComPtr<IDxcUtils> m_pUtils;
 		ComPtr<IDxcCompiler3> m_pCompiler;
 		ComPtr<IDxcContainerReflection> m_pContainerRefl;
-		ComPtr<IDxcLibrary> m_pLib;
 		//ComPtr<IDxcIncludeHandler> m_pIncHandler;
 
-		std::vector<LPCWSTR> GetDxcArguments(std::vector<ShaderCompileOption>const& _opts);
+		//コンパイルオプションの配列を後ろに漬けてく。
+		void PushBackDxcArguments(ShaderCompileOption const* _opts, size_t optSize, IDxcCompilerArgs* _cargs);
 	};
 
 	class FXCompiler: public ShaderCompiler
