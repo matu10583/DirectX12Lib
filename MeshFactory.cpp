@@ -1,5 +1,5 @@
 #include "D3D12FrameWork/MeshFactory.h"
-#include "D3D12FrameWork/PipelineStateObject.h"
+#include "D3D12FrameWork/GraphicPipelineStateObject.h"
 
 
 

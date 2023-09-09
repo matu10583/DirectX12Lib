@@ -137,20 +137,7 @@ namespace D3D12FrameWork {
 		std::vector<ShaderOutputElementDesc> m_elementDescs;
 	};
 
-	//Ä‹A“I‚ÉŒ^‚ğ’T‚·
-	class NULLTYPE{};
-	template<typename T, typename Head, typename... Tail>
-	struct FindType{
-		static const bool value = FindType<T, Tail...,NULLTYPE>::value;
-	};
-	template<typename T, typename... Tail>
-	struct FindType<T, T, Tail...> {
-		static const bool value = true;
-	};
-	template<typename T>
-	struct FindType<T, NULLTYPE> {
-		static const bool value = false;
-	};
+
 
 	template<typename T>
 	concept ShaderBindInfo = FindType<T, ShaderRegisterDescs, ShaderInputDescs, ShaderOutputDescs>::value;

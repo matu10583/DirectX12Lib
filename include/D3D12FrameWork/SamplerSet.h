@@ -22,7 +22,7 @@ namespace D3D12FrameWork {
 		bool HasKey(std::string_view _name) const {
 			return m_samplerMap.count(std::string(_name.data()));
 		}
-		std::vector<std::reference_wrapper<IResourceView const>> const& GetViews()const override {
+		std::vector<std::reference_wrapper<IResourceView const>> const GetViews()const override {
 			std::vector<std::reference_wrapper<IResourceView const>> ret;
 			std::transform(m_samplerViewRef.begin(), m_samplerViewRef.end(),
 				std::back_inserter(ret),

@@ -164,6 +164,7 @@
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
+    <ClCompile Include="MeshShaderApp.cpp" />
     <ClCompile Include="ModelLoader.cpp">
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MultiThreadedDLL</RuntimeLibrary>
@@ -228,6 +229,7 @@
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
+    <ClCompile Include="MSPipelineStateObject.cpp" />
     <ClCompile Include="RenderComponent.cpp">
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MultiThreadedDLL</RuntimeLibrary>
@@ -236,7 +238,7 @@
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
-    <ClCompile Include="PipelineStateObject.cpp">
+    <ClCompile Include="GraphicPipelineStateObject.cpp">
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
@@ -252,6 +254,7 @@
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
+    <ClCompile Include="RPRegisterDescSet.cpp" />
     <ClCompile Include="SamplerSet.cpp">
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MultiThreadedDLL</RuntimeLibrary>
@@ -330,12 +333,14 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\D3D12FrameWork\details\MSPipelineState_detail.h" />
+    <ClInclude Include="include\D3D12FrameWork\MeshShaderApp.h" />
     <ClInclude Include="include\D3D12FrameWork\ModelLoader.h" />
     <ClInclude Include="include\D3D12FrameWork\DescriptorChankAllocator.h" />
     <ClInclude Include="include\D3D12FrameWork\GlobalDescriptorHeap.h" />
     <ClInclude Include="include\D3D12FrameWork\ImageLoader.h" />
     <ClInclude Include="include\D3D12FrameWork\ConstantBufferSet.h" />
-    <ClInclude Include="include\D3D12FrameWork\details\PipelineStateObject_detail.h" />
+    <ClInclude Include="include\D3D12FrameWork\details\GraphicPipelineStateObject_detail.h" />
     <ClInclude Include="include\D3D12FrameWork\details\ShaderSet.h" />
     <ClInclude Include="include\D3D12FrameWork\EnumNameConverter.h" />
     <ClInclude Include="include\D3D12FrameWork\File.h" />
@@ -364,7 +369,7 @@
     <ClInclude Include="include\D3D12FrameWork\ShaderBlob.h" />
     <ClInclude Include="include\D3D12FrameWork\ShaderKind.h" />
     <ClInclude Include="include\D3D12FrameWork\ShaderSet.h" />
-    <ClInclude Include="include\D3D12FrameWork\PipelineStateObject.h" />
+    <ClInclude Include="include\D3D12FrameWork\GraphicPipelineStateObject.h" />
     <ClInclude Include="include\D3D12FrameWork\Set.h" />
     <ClInclude Include="include\D3D12FrameWork\RootParameterBuffer.h" />
     <ClInclude Include="include\D3D12FrameWork\TextureSet.h" />
@@ -383,6 +388,8 @@
     <ClInclude Include="include\D3D12FrameWork\LambdaRPBuffer.h" />
     <ClInclude Include="include\D3D12FrameWork\LambdaRPBufferAllocator.h" />
     <ClInclude Include="include\D3D12FrameWork\util\wcharUtil.h" />
+    <ClInclude Include="include\D3D12FrameWork\RPRegisterDescSet.h" />
+    <ClInclude Include="include\D3D12FrameWork\MSPipelineStateObject.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="External\clipBoard.txt" />
@@ -399,6 +406,12 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Mesh</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Mesh</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.5</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="shader\mesh\SimplePS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="shader\triangle\trianglePS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>

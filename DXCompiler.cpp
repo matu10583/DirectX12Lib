@@ -111,8 +111,6 @@ namespace D3D12FrameWork{
 		RETURNIFFAILED(hr);
 		hr = ::DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&m_pCompiler));
 		RETURNIFFAILED(hr);
-		/*hr = m_pUtils->CreateDefaultIncludeHandler(&m_pIncHandler);
-		RETURNIFFAILED(hr);*/
 		hr = ::DxcCreateInstance(CLSID_DxcContainerReflection, IID_PPV_ARGS(&m_pContainerRefl));
 		RETURNIFFAILED(hr);
 
@@ -208,7 +206,7 @@ namespace D3D12FrameWork{
 				assert(false);
 				return false;
 			}
-
+			
 			hr = m_pCompiler->Compile(
 				&srcBuff,
 				pCmpArgs->GetArguments(),

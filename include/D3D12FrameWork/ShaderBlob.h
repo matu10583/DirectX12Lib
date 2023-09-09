@@ -72,6 +72,21 @@ namespace D3D12FrameWork {
 			VERTEX = 1 << 1,
 			COMPUTE = 1 << 2,
 			GEOMETRY = 1 << 3,
+			AMPLIFY = 1 << 4,
+			MESH = 1 << 5,
+		};
+		//Ä‹A“I‚ÉŒ^‚ð’T‚·
+		template<ShaderType T, ShaderType Head, ShaderType... Tail>
+		struct FindShaderType {
+			static const bool value = FindShaderType<T, Tail..., ShaderType::NONE>::value;
+		};
+		template<ShaderType T, ShaderType... Tail>
+		struct FindShaderType<T, T, Tail...> {
+			static const bool value = true;
+		};
+		template<ShaderType T>
+		struct FindShaderType<T, ShaderBlob::NONE> {
+			static const bool value = false;
 		};
 
 

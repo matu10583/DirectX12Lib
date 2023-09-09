@@ -61,7 +61,7 @@ namespace D3D12FrameWork {
 			return m_textureMap.count(std::string(_name.data()));
 		}
 
-		std::vector<std::reference_wrapper<IResourceView const>> const& GetViews()const override {
+		std::vector<std::reference_wrapper<IResourceView const>> const GetViews()const override {
 			std::vector<std::reference_wrapper<IResourceView const>> ret;
 			std::transform(m_textureViews.begin(), m_textureViews.end(),
 				std::back_inserter(ret),

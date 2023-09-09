@@ -1,4 +1,4 @@
-#include "D3D12FrameWork/TestApp.h"
+#include "D3D12FrameWork/MeshShaderApp.h"
 #include "D3D12FrameWork/D3DDevice.h"
 #include "D3D12FrameWork/CommandList.h"
 #include "D3D12FrameWork/CommandQueue.h"
@@ -24,9 +24,9 @@
 
 namespace {
 	//ウィンドウクラス名
-	const auto CLASSNAME = TEXT("RenderFrameworkSample");
+	const auto CLASSNAME = TEXT("MeshRenderSample");
 	//ウィンドウ名
-	const auto WNDNAME = TEXT("RenderFramework");
+	const auto WNDNAME = TEXT("MeshRender");
 
 	//pix on windowsによるデバッグ
 
@@ -61,20 +61,21 @@ namespace {
 	}
 #endif // defined(DEBUG) || defined(_DEBUG)
 }
+
 namespace D3D12FrameWork {
 
-	TestApp::~TestApp() {
+	MeshShaderApp::~MeshShaderApp() {
 
 	}
 
-	void TestApp::Run() {
+	void MeshShaderApp::Run() {
 		if (Init()) {
 			MainLoop();
 		}
 		Term();
 	}
 
-	bool TestApp::Init() {
+	bool MeshShaderApp::Init() {
 		if (!ShaderCompiler::Create(ShaderCompiler::ShaderCompilerType::DXC)) {
 			return false;
 		}
@@ -89,7 +90,7 @@ namespace D3D12FrameWork {
 	}
 
 	//ウィンドウの初期化
-	bool TestApp::InitWindow() {
+	bool MeshShaderApp::InitWindow() {
 		//ハンドルの取得
 		auto hnd = GetModuleHandle(nullptr);
 		if (hnd == nullptr) {
@@ -158,7 +159,7 @@ namespace D3D12FrameWork {
 	}
 
 	LRESULT CALLBACK
-		TestApp::WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
+		MeshShaderApp::WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 		switch (msg)
 		{
 		case WM_DESTROY:
@@ -171,7 +172,7 @@ namespace D3D12FrameWork {
 		return DefWindowProc(hwnd, msg, wp, lp);
 	}
 
-	bool TestApp::InitD3D() {
+	bool MeshShaderApp::InitD3D() {
 #if defined(DEBUG) || defined(_DEBUG)
 		{
 			ComPtr<ID3D12Debug> debug;
@@ -188,7 +189,8 @@ namespace D3D12FrameWork {
 
 #endif // defined(DEBUG) || defined(_DEBUG)
 		//デバイスの作成
-		if (!m_device.Init(m_hwnd, m_width, m_height)) {
+		if (!m_device.Init(m_hwnd, m_width, m_height) &&
+			!m_device.CheckMeshShaderSupport()) {
 			assert(false);
 			return false;
 		}
@@ -224,7 +226,7 @@ namespace D3D12FrameWork {
 		//コピーを途中で行うので最後に使うであろうリストを初期化しておく
 		auto currentFrameIdx = m_device.GetSwapChain()->GetCurrentFrameIndex();
 		auto& nowCmdList = m_mainCommandLists[
-			(currentFrameIdx+DX12Settings::BUFFER_COUNT-1)%DX12Settings::BUFFER_COUNT];
+			(currentFrameIdx + DX12Settings::BUFFER_COUNT - 1) % DX12Settings::BUFFER_COUNT];
 
 
 		//コマンドリストの実行
@@ -274,11 +276,11 @@ namespace D3D12FrameWork {
 		psDesc.BlendState.RenderTarget[0].RenderTargetWriteMask =
 			D3D12_COLOR_WRITE_ENABLE_ALL;
 
-		m_pso.PrepareRootSignature(&m_rootSig);
-		m_pso.PrepareShaderAsInput<ShaderBlob::VERTEX>(L"triangle/triangleVS");
-		m_pso.PrepareShaderAsOutput<ShaderBlob::PIXEL>(L"triangle/trianglePS");
 		
-		m_pso.EndPrepareAndInit(psDesc,&m_device);
+		m_pso.PrepareRootSignature(&m_rootSig);
+		m_pso.PrepareShaderAsOutput<ShaderBlob::PIXEL>(L"triangle/trianglePS");
+
+		m_pso.EndPrepareAndInit(psDesc, &m_device);
 
 		//マテリアルの作製
 		MaterialFactory::Create(&m_device);
@@ -322,7 +324,7 @@ namespace D3D12FrameWork {
 
 		auto material = m_renderComponent->Material(0);
 
-		material->GetController(0).SetVariable<float>("num", 1.1f,true);
+		material->GetController(0).SetVariable<float>("num", 1.1f, true);
 		material->GetController(0).SetTexture("g_texture", "res/texture/Desktop.png");
 		//cont.GetHandler(1).SetSampler("g_sampler", smp_desc);
 
@@ -337,7 +339,7 @@ namespace D3D12FrameWork {
 			"test_fbx",
 			&m_pso
 		);
-		auto vertices = std::span<BasicVertex>();
+		auto vertices = std::span<BasicVertexM>();
 		auto indices = std::span<unsigned short>();
 		//ModelLoader<BasicVertex>::Load(
 		//	"res/model/ac_guitar.fbx", vertices, indices
@@ -348,24 +350,24 @@ namespace D3D12FrameWork {
 		auto mesh = m_renderComponent->Mesh();
 
 		//vbの作製(あとで変更する．)
-		std::vector<BasicVertex> triangleVertices;
+		std::vector<BasicVertexM> triangleVertices;
 		triangleVertices.emplace_back(
-			BasicVertex(Vector4(-1.0f, -1.0f, 0.0f, 1.0f), { 1.0f,0.0f,0.0f,1.0f })
+			BasicVertexM(Vector4(-1.0f, -1.0f, 0.0f, 1.0f), { 1.0f,0.0f,0.0f,1.0f })
 		);
 		triangleVertices.emplace_back(
-			BasicVertex(Vector4(-1.0f, 1.0f, 0.0f, 1.0f), { 0.0f,0.0f,1.0f,1.0f })
+			BasicVertexM(Vector4(-1.0f, 1.0f, 0.0f, 1.0f), { 0.0f,0.0f,1.0f,1.0f })
 		);
 		triangleVertices.emplace_back(
-			BasicVertex(Vector4(1.0f, -1.0f, 0.0f, 1.0f), { 0.0f,1.0f,0.0f,1.0f })
+			BasicVertexM(Vector4(1.0f, -1.0f, 0.0f, 1.0f), { 0.0f,1.0f,0.0f,1.0f })
 		);
-		mesh->GetController().SetVertices<BasicVertex>(
+		mesh->GetController().SetVertices<BasicVertexM>(
 			triangleVertices, 0
 			);
 
 		return true;
 	}
 
-	void TestApp::MainLoop() {
+	void MeshShaderApp::MainLoop() {
 		MSG msg = {};
 		while (WM_QUIT != msg.message)
 		{
@@ -375,12 +377,12 @@ namespace D3D12FrameWork {
 				DispatchMessage(&msg);
 			}
 			BeginFrame();
-			
+
 			Draw();
 		}
 	}
 
-	void TestApp::TermWindow() {
+	void MeshShaderApp::TermWindow() {
 		if (m_hInst != nullptr) {
 			UnregisterClass(CLASSNAME, m_hInst);
 		}
@@ -389,7 +391,7 @@ namespace D3D12FrameWork {
 		m_hwnd = nullptr;
 	}
 
-	void TestApp::Term() {
+	void MeshShaderApp::Term() {
 		m_pVB.reset();
 		ShaderCompiler::Destroy();
 		MaterialFactory::Destroy();
@@ -397,7 +399,7 @@ namespace D3D12FrameWork {
 		TermWindow();
 	}
 
-	void TestApp::BeginFrame() {
+	void MeshShaderApp::BeginFrame() {
 		m_device.WaitPresent();
 		auto currentFrameIdx = m_device.GetSwapChain()->GetCurrentFrameIndex();
 		auto& nowCmdList = m_mainCommandLists[currentFrameIdx];
@@ -405,7 +407,7 @@ namespace D3D12FrameWork {
 	}
 
 	void
-		TestApp::Draw() {
+		MeshShaderApp::Draw() {
 		m_device.SyncKill();
 
 		auto pCmdQueue = m_device.GetCmdQueue();
@@ -423,7 +425,7 @@ namespace D3D12FrameWork {
 		nowCmdList.SetAndClearRenderTargets(
 			m_device.GetSwapChain()->GetCurrentRTV(),
 			1,
-			{1.0,0.25f,0.25f,1.0f}
+			{ 1.0,0.25f,0.25f,1.0f }
 		);
 
 		auto const& scDesc = m_device.GetSwapChain()->GetCurrentTexture()->GetTextureDesc();
@@ -444,7 +446,7 @@ namespace D3D12FrameWork {
 		};
 		nowCmdList.SetScissorRect(&sr, 1);
 
-		nowCmdList.Draw(m_renderComponent.get(), &m_device);
+		nowCmdList.DrawMesh(m_renderComponent.get(), &m_device);
 
 		nowCmdList.TransitState(
 			m_device.GetSwapChain()->GetCurrentTexture(),
@@ -452,10 +454,10 @@ namespace D3D12FrameWork {
 			D3D12_RESOURCE_STATE_PRESENT
 		);
 
-		CommandList* pCmdLists[] = {&nowCmdList};
+		CommandList* pCmdLists[] = { &nowCmdList };
 		m_device.EndAndExecuteCommandList(pCmdLists, ARRAYSIZE(pCmdLists));
-		
+
 		m_device.Present(1);
-		
+
 	}
 }

@@ -37,13 +37,13 @@ out indices uint3 tris[1]
     
     if (groupIndex < 3)
     {
-        MSOutput output1 = (MSOutput) 0;
+        MSOutput output = (MSOutput) 0;
         float4 localPos = float4(Vertices[groupIndex].Position, 1.0f);
         float4 worldPos = mul(Transform.World, localPos);
         float4 viewPos = mul(Transform.View, worldPos);
         float4 projPos = mul(Transform.Proj, viewPos);
-        output1.Position = projPos;
-        output1.Color = Vertices[groupIndex].Color;
-        verts[groupIndex] = output1;
+        output.Position = projPos;
+        output.Color = Vertices[groupIndex].Color;
+        verts[groupIndex] = output;
     }
 }

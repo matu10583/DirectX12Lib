@@ -78,7 +78,7 @@
     <ClCompile Include="ShaderSet.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="PipelineStateObject.cpp">
+    <ClCompile Include="GraphicPipelineStateObject.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="ShaderBindInfo.cpp">
@@ -145,6 +145,15 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="ModelLoader.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="RPRegisterDescSet.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="MSPipelineStateObject.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshShaderApp.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -224,7 +233,7 @@
     <ClInclude Include="include\D3D12FrameWork\ShaderSet.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="include\D3D12FrameWork\PipelineStateObject.h">
+    <ClInclude Include="include\D3D12FrameWork\GraphicPipelineStateObject.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="include\D3D12FrameWork\Set.h">
@@ -236,7 +245,7 @@
     <ClInclude Include="include\D3D12FrameWork\EnumNameConverter.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="include\D3D12FrameWork\details\PipelineStateObject_detail.h">
+    <ClInclude Include="include\D3D12FrameWork\details\GraphicPipelineStateObject_detail.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="include\D3D12FrameWork\details\ShaderSet.h">
@@ -308,6 +317,18 @@
     <ClInclude Include="include\D3D12FrameWork\util\wcharUtil.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="include\D3D12FrameWork\RPRegisterDescSet.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="include\D3D12FrameWork\MSPipelineStateObject.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="include\D3D12FrameWork\details\MSPipelineState_detail.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="include\D3D12FrameWork\MeshShaderApp.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="External\clipBoard.txt" />
@@ -319,5 +340,6 @@
     <FxCompile Include="shader\triangle\triangleVS.hlsl" />
     <FxCompile Include="shader\triangle\trianglePS.hlsl" />
     <FxCompile Include="shader\mesh\SimpleMS.hlsl" />
+    <FxCompile Include="shader\mesh\SimplePS.hlsl" />
   </ItemGroup>
 </Project>

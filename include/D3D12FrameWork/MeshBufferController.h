@@ -39,6 +39,7 @@ namespace D3D12FrameWork {
 			}
 			CommandList* pCmdList[] = { &m_cmdList };
 			m_pRefDev->EndAndExecuteCommandList(pCmdList, 1);
+			return true;
 		}
 
 		//template<typename T>

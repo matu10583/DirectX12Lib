@@ -41,7 +41,7 @@ namespace D3D12FrameWork {//DescTblRange‚ª‘Î‰‚·‚éD
 		IDescriptorRangeSet() = default;
 		virtual ~IDescriptorRangeSet() = default;
 		DECLMOVECOPY(IDescriptorRangeSet);
-		virtual std::vector<std::reference_wrapper<IResourceView const>> const& GetViews()const = 0;
+		virtual std::vector<std::reference_wrapper<IResourceView const>> const GetViews()const = 0;
 		virtual RangeCopyDesc GetCopyDesc()const = 0;
 		//virtual unsigned int const DescriptorHeapVersion()const = 0;
 		virtual size_t NumViews() const = 0;
@@ -84,7 +84,7 @@ namespace D3D12FrameWork {//DescTblRange‚ª‘Î‰‚·‚éD
 			return false;
 		}
 
-		std::vector<std::reference_wrapper<IResourceView const>> const& GetViews()const override {
+		std::vector<std::reference_wrapper<IResourceView const>> const GetViews()const override {
 			std::vector<std::reference_wrapper<IResourceView const>> ret;
 			std::transform(m_orderedCBInfo.begin(), m_orderedCBInfo.end(),
 				std::back_inserter(ret),

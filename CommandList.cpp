@@ -5,7 +5,7 @@
 #include "D3D12FrameWork/Texture.h"
 #include "D3D12FrameWork/RootParameterBuffer.h"
 #include "D3D12FrameWork/RenderComponent.h"
-#include "D3D12FrameWork/PipelineStateObject.h"
+#include "D3D12FrameWork/GraphicPipelineStateObject.h"
 #include "D3D12FrameWork/RootSignature.h"
 namespace D3D12FrameWork {
 	CommandList::CommandList() {
@@ -146,7 +146,7 @@ namespace D3D12FrameWork {
 		CommandList::SetGlobalDescriptorHeap() {
 		auto const heaps = m_rpHeap->GetHeaps();
 		m_pCommandList->SetDescriptorHeaps(
-			heaps.size(), heaps.data());
+			static_cast<UINT>(heaps.size()), heaps.data());
 		for (int i = 0; i < m_rpHeap->GetRPChankNum(); i++) {
 			m_pCommandList->SetGraphicsRootDescriptorTable(
 				i, m_rpHeap->GetRPDescriptorHeapChank(i).GpuHandle
@@ -178,12 +178,37 @@ namespace D3D12FrameWork {
 		m_pCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		auto const& meshView = _pRc->Mesh()->GetView();
 		auto vbv = meshView.GetVBViews();
-		m_pCommandList->IASetVertexBuffers(0, vbv.size(), vbv.data());
+		m_pCommandList->IASetVertexBuffers(0, static_cast<UINT>(vbv.size()), vbv.data());
 
 		m_pCommandList->DrawInstanced(meshView.NumVertices(), meshView.NumInstances(), 0, 0);
 
 		_pRc->AfterDraw(0);
 	}
+	void
+		CommandList::DrawMesh(
+			RenderComponent* _pRc, D3DDevice* _pDev
+		) {
+		bool isLayoutStable = true;
+
+		//後でindexを使う際はマテリアル毎にメッシュを分けて描画するようにする。
+		auto const matSize = _pRc->Material(0)->Size();
+		for (int i = 0; i < matSize; i++) {
+			auto const& matView = _pRc->Material(0)->GetView(i);
+			//rootparameterにコピー.isLayoutStableはglobalheapchankの場所が変わっているかを表すけどいるのか？
+			isLayoutStable = isLayoutStable && m_rpHeap->CopyToHeapChank(_pDev,
+				matView.GetCopyDesc(),
+				i,
+				matView.GetType()
+			);
+		}
+		//rootparameterのセット
+		SetGlobalDescriptorHeap();
+
+		m_pCommandList->DispatchMesh(1, 1, 1);
+
+		_pRc->AfterDraw(0);
+	}
+
 	void CommandList::SetGraphicPipeline(IPipelineStateObject const* _pso) {
 		m_pCommandList->SetPipelineState(_pso->GetPipelineState());
 		m_pCommandList->SetGraphicsRootSignature(_pso->GetRootSignature()->GetDxRootSignature());

@@ -18,7 +18,7 @@ namespace EnumNameConverter {
 		}
 
 		char buf[N];
-		static constexpr int length = N - 1;
+		static constexpr size_t length = N - 1;
 	};
 
 	template<size_t N, size_t Start, size_t Length>

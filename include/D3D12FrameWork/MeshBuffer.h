@@ -19,7 +19,7 @@ namespace D3D12FrameWork {
 		DECLMOVECOPY(MeshBuffer);
 
 		bool Init(
-			struct ShaderInputDescs const&,
+			class ShaderInputDescs const&,
 			bool useIndex
 		);
 
@@ -36,10 +36,10 @@ namespace D3D12FrameWork {
 				return false;
 			}
 			if (_slotNum == 0) {//perVerticesのデータ
-				m_numVerts = _vertices.size();
+				m_numVerts = static_cast<uint32_t>(_vertices.size());
 			}
 			else {//perInstanceのデータ
-				m_numInstances = _vertices.size();
+				m_numInstances = static_cast<uint32_t>(_vertices.size());
 			}
 			return m_vertexBuffs[_slotNum]->SetVertices<T>(
 				_pDev, _pCmdList, _vertices

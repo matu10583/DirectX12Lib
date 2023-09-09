@@ -70,9 +70,10 @@ namespace D3D12FrameWork {
 			return m_pSwapChain.get();
 		}
 
+		bool CheckMeshShaderSupport();
 
 	private:
-		ComPtr<ID3D12Device> m_pDevice;
+		ComPtr<ID3D12Device8> m_pDevice;
 		ComPtr<IDXGIFactory7> m_pFactory;
 		//unqPtr<CommandList[]> m_pCommandLists;
 		unqPtr<CommandQueue> m_pCommandQueue;

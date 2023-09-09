@@ -33,7 +33,7 @@ namespace D3D12FrameWork {
 			m_pBuffer = std::make_unique<Buffer>();
 			if (!m_pBuffer->InitAsDefaultBuffer(
 				_pDev,
-				sizeof(T)*_vertices.size(),
+				static_cast<uint32_t>(sizeof(T)*_vertices.size()),
 				_pCmdList,
 				reinterpret_cast<uint8_t const*>(_vertices.data())
 			)) {
@@ -43,7 +43,7 @@ namespace D3D12FrameWork {
 
 			//view�̍쐻
 			m_vbv.BufferLocation = m_pBuffer->GetGPUVirtualAddress();
-			m_vbv.SizeInBytes = sizeof(T)*_vertices.size();
+			m_vbv.SizeInBytes = static_cast<UINT>(sizeof(T)*_vertices.size());
 			m_vbv.StrideInBytes = sizeof(T);
 
 			return true;
@@ -74,7 +74,7 @@ namespace D3D12FrameWork {
 			}
 
 			m_vbv.BufferLocation = m_pBuffer->GetGPUVirtualAddress();
-			m_vbv.SizeInBytes = sizeof(T) * _vertices.size();
+			m_vbv.SizeInBytes = static_cast<UINT>(sizeof(T) * _vertices.size());
 			m_vbv.StrideInBytes = sizeof(T);
 
 

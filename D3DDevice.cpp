@@ -201,4 +201,36 @@ namespace D3D12FrameWork {
 	void D3DDevice::WaitSignal() {
 		m_pFence->WaitSignal();
 	}
+
+	bool D3DDevice::CheckMeshShaderSupport() {
+			{
+				//shade model をチェック
+				D3D12_FEATURE_DATA_SHADER_MODEL shaderModel = {
+					D3D_SHADER_MODEL_6_5
+				};
+				auto hr = m_pDevice->CheckFeatureSupport(
+					D3D12_FEATURE_SHADER_MODEL, &shaderModel, sizeof(shaderModel)
+				);
+				if (FAILED(hr) ||
+					shaderModel.HighestShaderModel < D3D_SHADER_MODEL_6_5) {
+					OutputDebugStringA("Error: Shader Model 6.5 is not supported.");
+					return false;
+				}
+			}
+
+			//msをチェック
+			{
+				D3D12_FEATURE_DATA_D3D12_OPTIONS7 features = {};
+				auto hr = m_pDevice->CheckFeatureSupport(
+					D3D12_FEATURE_D3D12_OPTIONS7, &features,
+					sizeof(features)
+				);
+				if (FAILED(hr) ||
+					features.MeshShaderTier == D3D12_MESH_SHADER_TIER_NOT_SUPPORTED) {
+					OutputDebugStringA("Error: Mesh Shaders aren't supported");
+					return false;
+				}
+			}
+			return true;
+	}
 }

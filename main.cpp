@@ -4,7 +4,7 @@
 #endif // defined(DEBUG) || defined(_DEBUG)
 
 #include "D3D12FrameWork/TestApp.h"
-#include "D3D12FrameWork/EnumNameConverter.h"
+#include "D3D12FrameWork/MeshShaderApp.h"
 
 int wmain(int argc, wchar_t** argv, wchar_t** envp) {
 #if defined(DEBUG) || defined(_DEBUG)
@@ -13,7 +13,9 @@ int wmain(int argc, wchar_t** argv, wchar_t** envp) {
 		_CRTDBG_LEAK_CHECK_DF
 	);
 #endif // defined(DEBUG) || defined(_DEBUG)
-	D3D12FrameWork::TestApp testApp(960, 540);
+	//D3D12FrameWork::TestApp testApp(960, 540);
+	//testApp.Run();
+	D3D12FrameWork::MeshShaderApp testApp(960, 540);
 	testApp.Run();
 	return 0;
 }

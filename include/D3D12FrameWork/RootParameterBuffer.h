@@ -1,6 +1,6 @@
 #pragma once
 #include "D3D12FrameWork/ComPtr.h"
-#include "D3D12FrameWork/PipelineStateObject.h"
+#include "D3D12FrameWork/GraphicPipelineStateObject.h"
 #include "D3D12FrameWork/RootSignature.h"
 #include "D3D12FrameWork/ConstantBufferSet.h"
 #include "D3D12FrameWork/TextureSet.h"
@@ -12,7 +12,8 @@ namespace D3D12FrameWork {
 		CBV_SRV_UAV=0,
 		RTV,
 		DSV,
-		SMP
+		SMP,
+		MAX_SIZE
 	};
 
 	class RootParameterBuffer
@@ -97,6 +98,8 @@ namespace D3D12FrameWork {
 			if (
 				!m_samplerRangeBuffers.empty()
 				) return RPBufferType::CBV_SRV_UAV;
+			assert(false);
+			return RPBufferType::MAX_SIZE;
 		}
 
 	private:

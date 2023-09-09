@@ -1,5 +1,5 @@
 
-#include "D3D12FrameWork/PipelineStateObject.h"
+#include "D3D12FrameWork/GraphicPipelineStateObject.h"
 #include "D3D12FrameWork/RootSignature.h"
 #include "D3D12FrameWork/ShaderBindInfo.h"
 #include "D3D12FrameWork/D3DDevice.h"
@@ -9,18 +9,18 @@
 
 namespace D3D12FrameWork {
 	template<ShaderBlob::ShaderType... ST>
-	bool PipelineStateObject<ST...>::PrepareRootSignature(
+	bool GraphicPipelineStateObject<ST...>::PrepareRootSignature(
 		RootSignature* _pRS
 	) {
-		m_rootParamsRegDescs.resize(_pRS->GetRootParamDescs().size());
+		m_rootParamsRegDescs.Resize(_pRS->GetRootParamDescs().size());
 		m_defaultRpBuffNames.resize(_pRS->GetRootParamDescs().size());
 		m_pRefRootSignature = _pRS;
 		return true;
 	}
 
 	template<ShaderBlob::ShaderType... ST>
-	bool PipelineStateObject<ST...>::EndPrepareAndInit(
-		PipelineStateDesc const&& _psoDesc,
+	bool GraphicPipelineStateObject<ST...>::EndPrepareAndInit(
+		GraphicPipelineStateDesc const& _psoDesc,
 		D3DDevice* _pDevice) {
 
 		std::vector<D3D12_INPUT_ELEMENT_DESC> in_elem{};
@@ -49,24 +49,32 @@ namespace D3D12FrameWork {
 
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
 		auto const& shaderFlag = m_shaderSet.GetShaderFlag();
-		if (!(shaderFlag & ShaderBlob::PIXEL).IsEmpty()) {
-			auto const& psBlob = m_shaderSet.GetShader<ShaderBlob::PIXEL>().GetBlob();
-			psoDesc.PS.pShaderBytecode = psBlob->GetBufferPointer();
-			psoDesc.PS.BytecodeLength = psBlob->GetBufferSize();
-		}
-		if (!(shaderFlag & ShaderBlob::VERTEX).IsEmpty()) {
-			auto const& vsBlob = m_shaderSet.GetShader<ShaderBlob::VERTEX>().GetBlob();
-			psoDesc.VS.pShaderBytecode = vsBlob->GetBufferPointer();
-			psoDesc.VS.BytecodeLength = vsBlob->GetBufferSize();
-		}
+
+		//shader’è‹`—p 
+#define SETSHADER(SType,DescName)\
+if constexpr(ShaderBlob::FindShaderType<ShaderBlob::SType,ST...>::value){\
+		if (!(shaderFlag & ShaderBlob::SType).IsEmpty()) {\
+		D3D12_SHADER_BYTECODE shader = {};\
+		auto const& shaderBlob = m_shaderSet.GetShader<ShaderBlob::SType>().GetBlob();\
+		shader.pShaderBytecode = shaderBlob->GetBufferPointer();\
+		shader.BytecodeLength = shaderBlob->GetBufferSize();\
+		psoDesc.DescName = shader;\
+		}\
+};
+		SETSHADER(PIXEL, PS);
+		SETSHADER(VERTEX, VS);
+
+#undef SETSHADER
+
+
 		psoDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
-		psoDesc.RasterizerState = std::move(_psoDesc.RasterizerState);
-		psoDesc.BlendState = std::move(_psoDesc.BlendState);
-		psoDesc.InputLayout = std::move(in_layout);
+		psoDesc.RasterizerState = _psoDesc.RasterizerState;
+		psoDesc.BlendState = _psoDesc.BlendState;
+		psoDesc.InputLayout = in_layout;
 		psoDesc.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;
 		psoDesc.PrimitiveTopologyType = _psoDesc.PrimitiveTopologyType;
-		psoDesc.SampleDesc = std::move(_psoDesc.SampleDesc);
-
+		psoDesc.SampleDesc = _psoDesc.SampleDesc;
+		psoDesc.DepthStencilState = _psoDesc.DepthStencil;
 
 		UINT numRT = 0;
 		for (size_t i = 0; i < m_outputDesc.GetSize(); i++) {

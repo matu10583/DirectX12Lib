@@ -87,7 +87,7 @@ namespace D3D12FrameWork{
 			assert(false);
 			return false;
 		}
-		descChkInfo = m_descChankAllocators[_type]->Allocate(_numDescriptors);
+		descChkInfo = m_descChankAllocators[_type]->Allocate(static_cast<uint32_t>(_numDescriptors));
 	//バージョンはあってもなくてもチャンと動くようにする。要するにnull状態もバージョンと考えて設計
 		return true;
 	}

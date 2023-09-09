@@ -7,7 +7,7 @@
 #include "D3D12FrameWork/CommandList.h"
 #include "D3D12FrameWork/VertexBuffer.h"
 #include "D3D12FrameWork/RootSignature.h"
-#include "D3D12FrameWork/PipelineStateObject.h"
+#include "D3D12FrameWork/GraphicPipelineStateObject.h"
 #include "D3D12FrameWork/RenderComponent.h"
 #include "D3D12FrameWork/Vector.h"
 #include <array>
@@ -54,7 +54,7 @@ namespace D3D12FrameWork {
 
 		std::array<CommandList, DX12Settings::BUFFER_COUNT> m_mainCommandLists;
 		unqPtr<VertexBuffer> m_pVB;
-		PipelineStateObject<ShaderBlob::VERTEX, ShaderBlob::PIXEL> m_pso;
+		GraphicPipelineStateObject<ShaderBlob::VERTEX, ShaderBlob::PIXEL> m_pso;
 		RootSignature m_rootSig;
 		unqPtr<RenderComponent> m_renderComponent;
 	};

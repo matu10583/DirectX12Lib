@@ -51,6 +51,7 @@ public:
 	);
 	void SetGlobalDescriptorHeap();
 	void Draw(class RenderComponent* _dc, D3DDevice* _pDev);
+	void DrawMesh(class RenderComponent* _dc, D3DDevice* _pDev);
 	void SetGraphicPipeline(
 		class IPipelineStateObject const* _pso
 	);
@@ -65,7 +66,7 @@ public:
 	}
 
 private:
-	ComPtr<ID3D12GraphicsCommandList> m_pCommandList;
+	ComPtr<ID3D12GraphicsCommandList6> m_pCommandList;
 	ComPtr<ID3D12CommandAllocator> m_pAllocator;
 	unqPtr<GlobalDescriptorHeap> m_rpHeap;
 };

@@ -106,5 +106,18 @@ fprintf(stderr,"[ERROR] (%s:%d: errno: %s) " M "\n", __FILE__, __LINE__, \
 	T(T&&)noexcept = default;\
 	T& operator=(T&&)noexcept=default;
 
-
+	//Ä‹A“I‚ÉŒ^‚ğ’T‚·
+	class NULLTYPE {};
+	template<typename T, typename Head, typename... Tail>
+	struct FindType {
+		static const bool value = FindType<T, Tail..., NULLTYPE>::value;
+	};
+	template<typename T, typename... Tail>
+	struct FindType<T, T, Tail...> {
+		static const bool value = true;
+	};
+	template<typename T>
+	struct FindType<T, NULLTYPE> {
+		static const bool value = false;
+	};
 }
