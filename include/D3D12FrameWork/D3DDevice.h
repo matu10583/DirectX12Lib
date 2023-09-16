@@ -37,8 +37,6 @@ namespace D3D12FrameWork {
 			uint32_t _numCmdLists);
 		void WaitPresent();
 		void Present(uint32_t _interval);
-		void Signal();
-		void WaitSignal();
 
 
 		//Getter
@@ -85,7 +83,7 @@ namespace D3D12FrameWork {
 		unqPtr<DescriptorAllocator> m_pDsvHeap;
 		unqPtr<DescriptorAllocator> m_pSmpHeap;
 		DeathList m_deathList;
-		unqPtr<Fence> m_pFence;
+		//unqPtr<Fence> m_pFence;
 		
 	};
 }

@@ -23,7 +23,7 @@ namespace D3D12FrameWork {
 		ComPtr<ID3D12Fence> m_pFence;
 		int32_t m_value;
 		int32_t m_waitValue;
-		HANDLE m_fenceEvent;
+		//HANDLE m_fenceEvent;
 
 	};
 }

@@ -64,7 +64,7 @@ namespace {
 namespace D3D12FrameWork {
 
 	TestApp::~TestApp() {
-
+		int a = 0;
 	}
 
 	void TestApp::Run() {
@@ -390,6 +390,11 @@ namespace D3D12FrameWork {
 	}
 
 	void TestApp::Term() {
+		//よくわからんし全部のコマンドリストが実行されるまで待っとく
+		for (auto& cmdlist : m_mainCommandLists) {
+			cmdlist.WaitSignal();
+		}
+
 		m_pVB.reset();
 		ShaderCompiler::Destroy();
 		MaterialFactory::Destroy();
@@ -401,6 +406,7 @@ namespace D3D12FrameWork {
 		m_device.WaitPresent();
 		auto currentFrameIdx = m_device.GetSwapChain()->GetCurrentFrameIndex();
 		auto& nowCmdList = m_mainCommandLists[currentFrameIdx];
+		//コマンドリストの実効が終わってない場合も待ってくれる
 		nowCmdList.Begin();
 	}
 

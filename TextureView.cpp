@@ -125,6 +125,7 @@ namespace D3D12FrameWork {
 			//	vdesc.Texture3D.WSize=//‚æ‚­‚í‚©‚ç‚È‚¢‚Ì‚ÅŒã‚ÅŽÀ‘•
 			assert(false);
 		}
+
 		vdesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 		_pDev->GetDev()->CreateShaderResourceView(
 			_pTexture->GetRes(),
@@ -134,6 +135,33 @@ namespace D3D12FrameWork {
 
 		return true;
 	}
+
+	bool 
+		ShaderResourceView::UpdateStructuredBufferView(
+		D3DDevice* _pDev,
+		Texture* _pTexture,
+		size_t _sizeElement,
+		UINT _numElements,
+		UINT _startIndex
+	) {
+		auto texDesc = _pTexture->GetTextureDesc();
+		D3D12_SHADER_RESOURCE_VIEW_DESC vdesc = {};
+		vdesc.Format = texDesc.format;
+		assert(texDesc.dimension == TextureDimension::STRUCTURED);
+		vdesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+		vdesc.Buffer.FirstElement = _startIndex;
+		vdesc.Buffer.NumElements = _numElements;
+		vdesc.Buffer.StructureByteStride = _sizeElement;
+		vdesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+
+		_pDev->GetDev()->CreateShaderResourceView(
+			_pTexture->GetRes(),
+			&vdesc,
+			m_descInfo.m_CpuHandle
+		);
+		return true;
+	}
+
 	void ShaderResourceView::Term() {
 		m_descInfo.Free();
 	}

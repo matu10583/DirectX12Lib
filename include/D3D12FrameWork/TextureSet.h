@@ -50,6 +50,10 @@ namespace D3D12FrameWork {
 		bool CreateResource(D3DDevice* _pdev, std::string_view _regName, 
 			TextureDesc const& desc,
 			bool isRenderTarget = false);
+		bool CreateStructuredBuffer(D3DDevice* _pdev, CommandList* _pcmdList,
+			std::string_view _regName,
+			uint8_t const* _data,
+			size_t const _sizeType, UINT const _numElements);
 
 		RenderTargetView const* GetRenderTargetView(std::string_view _regName) {
 			auto const regName = std::string(_regName.data());

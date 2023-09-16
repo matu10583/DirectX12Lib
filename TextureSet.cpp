@@ -86,6 +86,7 @@ namespace D3D12FrameWork{
 			assert(false);
 			return false;
 		}
+
 		if (!m_textureMap[regName].ViewSet.SRV.UpdateView(_pdev, m_textureMap[regName].pTexture.get())) {
 			assert(false);
 			return false;
@@ -101,6 +102,38 @@ namespace D3D12FrameWork{
 
 		if (!m_textureMap[regName].ViewSet.pRTV->UpdateView(
 			_pdev, m_textureMap[regName].pTexture.get())) {
+			assert(false);
+			return false;
+		}
+
+		return true;
+	}
+
+	bool 
+		TextureSet::CreateStructuredBuffer(D3DDevice* _pdev, CommandList* _pcmdList,
+			std::string_view _regName,
+			uint8_t const* _data,
+			size_t const _sizeType, UINT const _numElements) {
+		auto const regName = std::string(_regName.data());
+		if (!m_textureMap.count(regName)) return false;
+		m_textureMap[regName].pTexture.reset(new Texture());
+		//‰Šú‰»‚Ì•K—v‚ª‚ ‚é‚©
+		auto tex = m_textureMap[regName].pTexture.get();
+		auto texDesc = tex->GetTextureDesc();
+		auto preSize = texDesc.width * texDesc.height;
+		auto nowSize = _sizeType * _numElements;
+		if (preSize != nowSize &&
+			!m_textureMap[regName].pTexture->InitStructuredBuffer(_pdev, nowSize)) {
+			assert(false);
+			return false;
+		}
+		if (!m_textureMap[regName].pTexture->UploadAndCopyStructuredResource(
+			_pdev, _pcmdList, _data, nowSize)) {
+			assert(false);
+			return false;
+		}
+		if (!m_textureMap[regName].ViewSet.SRV.UpdateStructuredBufferView(
+			_pdev, m_textureMap[regName].pTexture.get(),_sizeType, _numElements)) {
 			assert(false);
 			return false;
 		}

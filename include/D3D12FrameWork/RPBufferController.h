@@ -1,6 +1,7 @@
 #pragma once
 #include "D3D12FrameWork/Common.h"
 #include "D3D12FrameWork/CommandList.h"
+#include "D3D12FrameWork/TextureSet.h"
 
 
 namespace D3D12FrameWork {
@@ -20,6 +21,26 @@ namespace D3D12FrameWork {
 			std::filesystem::path const& _fileName,
 			uint32_t const mipL=1
 		);
+
+		template<typename T>
+		bool SetStructuredBufferOfTexture(
+			//お名前とファイル名．ローダーを別クラスで作っておく
+			std::string_view regName,
+			T const* _const,
+			size_t _numElement
+		) {
+			auto tex = m_rpBuff.get().FindTextureFromRegisterName(regName);
+			m_cmdList.Begin();
+			if (!tex->CreateStructuredBuffer(
+				m_pRefDev, &m_cmdList, regName, reinterpret_cast<uint8_t const*>(_const), sizeof(T), _numElement)) {
+				assert(false);
+				return false;
+			}
+			CommandList* pCmdList[] = { &m_cmdList };
+			m_pRefDev->EndAndExecuteCommandList(pCmdList, 1);
+			return true;
+		}
+
 		bool SetSampler(
 			std::string_view regName,
 			D3D12_SAMPLER_DESC const& _smpDesc
@@ -51,7 +72,8 @@ namespace D3D12FrameWork {
 			return true;
 		}
 		template<typename T>
-		bool SetVariable(std::string_view regName, T const& _const,
+		bool SetVariableArray(std::string_view regName, T const* _const,
+			size_t elementNum,
 			bool setToAllBuffer=false,
 			bool _isDefaultHeap = false) {
 			size_t offset = 0;
@@ -64,8 +86,41 @@ namespace D3D12FrameWork {
 				m_cmdList.Begin();
 				if (!cb->CopyToResource(
 					m_pRefDev, &m_cmdList, regName,
-					reinterpret_cast<uint8_t const*>(&_const), sizeof(T),
+					reinterpret_cast<uint8_t const*>(_const), sizeof(T)*elementNum,
 					offset,setToAllBuffer
+				)) {
+					return false;
+				}
+				CommandList* pCmdList[] = { &m_cmdList };
+				m_pRefDev->EndAndExecuteCommandList(pCmdList, 1);
+			}
+			else {
+				if (!cb->CopyToMappedPtr(
+					regName, reinterpret_cast<uint8_t const*>(_const),
+					sizeof(T) * elementNum, offset, setToAllBuffer
+				)) {
+					assert(false);
+					return false;
+				}
+			}
+			return true;
+		}
+		template<typename T>
+		bool SetVariable(std::string_view regName, T const& _const,
+			bool setToAllBuffer = false,
+			bool _isDefaultHeap = false) {
+			size_t offset = 0;
+			auto cb = m_rpBuff.get().FindCBufferFromVariableName(regName, &offset);
+			if (cb == nullptr) {
+				assert(false);
+				return false;
+			}
+			if (_isDefaultHeap) {
+				m_cmdList.Begin();
+				if (!cb->CopyToResource(
+					m_pRefDev, &m_cmdList, regName,
+					reinterpret_cast<uint8_t const*>(&_const), sizeof(T),
+					offset, setToAllBuffer
 				)) {
 					return false;
 				}

@@ -17,9 +17,9 @@
 namespace D3D12FrameWork {
 	struct BasicVertexM
 	{
-		D3D12FrameWork::Vector4 Position;
+		D3D12FrameWork::Vector3 Position;
 		D3D12FrameWork::Vector4 Color;
-		BasicVertexM(D3D12FrameWork::Vector4 const& pos,
+		BasicVertexM(D3D12FrameWork::Vector3 const& pos,
 			D3D12FrameWork::Vector4 const& col)
 			:Position(pos)
 			, Color(col) {}

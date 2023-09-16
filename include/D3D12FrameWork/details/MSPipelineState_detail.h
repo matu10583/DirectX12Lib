@@ -14,7 +14,7 @@ namespace D3D12FrameWork {
 	bool MSPipelineStateObject<ST...>::PrepareRootSignature(
 		RootSignature* _pRS
 	) {
-		m_rootParamsRegDescs.Resize(_pRS->GetRootParamDescs().size());
+		m_rootParamsRegDescs.Init(_pRS->GetRootParamDescs());
 		m_defaultRpBuffNames.resize(_pRS->GetRootParamDescs().size());
 		m_pRefRootSignature = _pRS;
 		return true;
@@ -66,6 +66,7 @@ if constexpr(ShaderBlob::FindShaderType<ShaderBlob::SType,ST...>::value){\
 			}
 		}
 		rtFormat.NumRenderTargets = numRT;
+		psoDesc.RTFormats = rtFormat;
 
 		psoDesc.DSFormat = DXGI_FORMAT_UNKNOWN;
 		psoDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;

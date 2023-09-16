@@ -278,7 +278,8 @@ namespace D3D12FrameWork {
 
 		
 		m_pso.PrepareRootSignature(&m_rootSig);
-		m_pso.PrepareShaderAsOutput<ShaderBlob::PIXEL>(L"triangle/trianglePS");
+		m_pso.PrepareShader<ShaderBlob::MESH>(L"mesh/SimpleMS");
+		m_pso.PrepareShaderAsOutput<ShaderBlob::PIXEL>(L"mesh/SimplePS");
 
 		m_pso.EndPrepareAndInit(psDesc, &m_device);
 
@@ -324,45 +325,52 @@ namespace D3D12FrameWork {
 
 		auto material = m_renderComponent->Material(0);
 
-		material->GetController(0).SetVariable<float>("num", 1.1f, true);
-		material->GetController(0).SetTexture("g_texture", "res/texture/Desktop.png");
+		//material->GetController(0).SetVariable<float>("num", 1.1f, true);
+		//material->GetController(0).SetTexture("g_texture", "res/texture/Desktop.png");
 		//cont.GetHandler(1).SetSampler("g_sampler", smp_desc);
 
 
-		MeshFactory::Create(&m_device);
-		auto meshFac = MeshFactory::Instance();
-		meshFac->CreateMesh(
-			"test_mesh",
-			&m_pso
-		);
-		meshFac->CreateMesh(
-			"test_fbx",
-			&m_pso
-		);
-		auto vertices = std::span<BasicVertexM>();
-		auto indices = std::span<unsigned short>();
-		//ModelLoader<BasicVertex>::Load(
-		//	"res/model/ac_guitar.fbx", vertices, indices
+		//MeshFactory::Create(&m_device);
+		//auto meshFac = MeshFactory::Instance();
+		//meshFac->CreateMesh(
+		//	"test_mesh",
+		//	&m_pso
 		//);
+		//meshFac->CreateMesh(
+		//	"test_fbx",
+		//	&m_pso
+		//);
+		//auto vertices = std::span<BasicVertexM>();
+		//auto indices = std::span<unsigned short>();
+		////ModelLoader<BasicVertex>::Load(
+		////	"res/model/ac_guitar.fbx", vertices, indices
+		////);
 
 
-		m_renderComponent->CreateMeshSet("test_mesh");
-		auto mesh = m_renderComponent->Mesh();
+		//m_renderComponent->CreateMeshSet("test_mesh");
+		//auto mesh = m_renderComponent->Mesh();
 
 		//vbÇÃçÏêª(Ç†Ç∆Ç≈ïœçXÇ∑ÇÈÅD)
 		std::vector<BasicVertexM> triangleVertices;
 		triangleVertices.emplace_back(
-			BasicVertexM(Vector4(-1.0f, -1.0f, 0.0f, 1.0f), { 1.0f,0.0f,0.0f,1.0f })
+			BasicVertexM(Vector3(-1.0f, -1.0f, 0.0f), { 0.0f,0.0f,1.0f,1.0f })
 		);
 		triangleVertices.emplace_back(
-			BasicVertexM(Vector4(-1.0f, 1.0f, 0.0f, 1.0f), { 0.0f,0.0f,1.0f,1.0f })
+			BasicVertexM(Vector3(1.0f, -1.0f, 0.0f), { 0.0f,1.0f,0.0f,1.0f })
 		);
 		triangleVertices.emplace_back(
-			BasicVertexM(Vector4(1.0f, -1.0f, 0.0f, 1.0f), { 0.0f,1.0f,0.0f,1.0f })
+			BasicVertexM(Vector3(0.0f, 1.0f, 0.0f), { 1.0f,0.0f,0.0f,1.0f })
 		);
-		mesh->GetController().SetVertices<BasicVertexM>(
-			triangleVertices, 0
-			);
+
+		//setVert
+		material->GetController(0).SetStructuredBufferOfTexture<BasicVertexM>("Vertices", triangleVertices.data(),
+			triangleVertices.size());
+
+		//indices
+		std::array<uint32_t, 3> indices = { 0,1,2 };
+		material->GetController(0).SetStructuredBufferOfTexture<uint32_t>("Indices", indices.data(),
+			indices.size());
+
 
 		return true;
 	}
@@ -392,6 +400,9 @@ namespace D3D12FrameWork {
 	}
 
 	void MeshShaderApp::Term() {
+		for (auto& cmdlist : m_mainCommandLists) {
+			cmdlist.WaitSignal();
+		}
 		m_pVB.reset();
 		ShaderCompiler::Destroy();
 		MaterialFactory::Destroy();

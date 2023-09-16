@@ -118,12 +118,12 @@ namespace D3D12FrameWork {
 			return false;
 		}
 
-		//fence
-		m_pFence = std::make_unique<Fence>();
-		if (!m_pFence->Init(this)) {
-			assert(false);
-			return false;
-		}
+		////fence
+		//m_pFence = std::make_unique<Fence>();
+		//if (!m_pFence->Init(this)) {
+		//	assert(false);
+		//	return false;
+		//}
 		
 		if (!ConstantBufferView::CreateNullView(this)) {
 			assert(false);
@@ -147,7 +147,7 @@ namespace D3D12FrameWork {
 
 	void
 		D3DDevice::Term() {
-		m_pFence->WaitSignal();
+		//m_pFence->WaitSignal();
 		WaitPresent();
 		//‡”Ô‚É”jŠü‚·‚é•K—v‚ª‚ ‚éD
 
@@ -157,7 +157,7 @@ namespace D3D12FrameWork {
 		ConstantBufferView::DestroyNullView();
 		SamplerView::DestroyNullView();
 
-		m_pFence.reset();
+		//m_pFence.reset();
 		//delete graphic systems
 		m_pSwapChain.reset();
 		m_pCommandQueue.reset();
@@ -184,23 +184,18 @@ namespace D3D12FrameWork {
 			_numCmdLists,
 			pCmdLists.data()
 		);
-
+		for (int i = 0; i < _numCmdLists; i++) {
+			_cmdLists[i]->Signal(m_pCommandQueue.get());
+		}
 	}
 	void 
 		D3DDevice::Present(uint32_t _interval) {
 		m_pSwapChain->Present(_interval);
 
-		m_pFence->Signal(m_pCommandQueue.get());
-		m_pFence->WaitSignal();
+		//m_pFence->Signal(m_pCommandQueue.get());
+		//m_pFence->WaitSignal();
 	}
 
-	void D3DDevice::Signal() {
-		m_pFence->Signal(m_pCommandQueue.get());
-	}
-
-	void D3DDevice::WaitSignal() {
-		m_pFence->WaitSignal();
-	}
 
 	bool D3DDevice::CheckMeshShaderSupport() {
 			{

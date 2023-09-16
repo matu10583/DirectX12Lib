@@ -1,7 +1,6 @@
 #include "D3D12FrameWork/RPBufferController.h"
 #include "D3D12FrameWork/RootParameterBuffer.h"
 #include "D3D12FrameWork/ImageLoader.h"
-#include "D3D12FrameWork/TextureSet.h"
 
 namespace D3D12FrameWork{
 	RPBufferController::RPBufferController(RootParameterBuffer& _rpBuff,

@@ -70,8 +70,9 @@ namespace D3D12FrameWork {
 				BRegisterDesc.emplace_back(std::move(CreateRegisterDesc(bind_desc)));
 				BBindDesc[bind_desc.Name] = ConstantBindDesc::None();
 			}
-			if (bind_desc.Type >= D3D_SIT_TBUFFER &&
-				bind_desc.Type <= D3D_SIT_TEXTURE) {
+			if ((bind_desc.Type >= D3D_SIT_TBUFFER &&
+				bind_desc.Type <= D3D_SIT_TEXTURE) ||
+				bind_desc.Type == D3D_SIT_STRUCTURED) {
 				if (TBindDesc.count(bind_desc.Name)) continue;
 				TRegisterDesc.emplace_back(std::move(CreateRegisterDesc(bind_desc)));
 				TBindDesc[bind_desc.Name] = std::move(CreateTextureBindDesc(bind_desc));
@@ -94,8 +95,12 @@ namespace D3D12FrameWork {
 				return false;
 			}
 			if (!BBindDesc.count(b_desc.Name)) {
-				assert(false);
-				return false;
+				//assert(false);
+				//structured bufferのサイズはここに来るけどいるのか？
+				//そもそも新しい書き方だと構造体の中身が見れないっぽい。
+				//validationくらいには使えるか。。？
+				//return false;
+				continue;
 			}
 			//サイズ0ならまだ作られていない
 			if (BBindDesc[b_desc.Name].Size != 0) continue;
@@ -137,6 +142,9 @@ namespace D3D12FrameWork {
 			break;
 		case D3D_SRV_DIMENSION_TEXTURE3D:
 			dim = TextureDimension::Texture3D;
+			break;
+		case D3D_SRV_DIMENSION_BUFFER:
+			dim = TextureDimension::STRUCTURED;
 			break;
 		default:
 			assert(false && "未対応のテクスチャ");

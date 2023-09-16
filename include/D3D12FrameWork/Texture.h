@@ -20,6 +20,7 @@ namespace D3D12FrameWork {
 		Texture1D = 0,
 		Texture2D,
 		Texture3D,
+		STRUCTURED,
 		Max
 	};
 
@@ -67,6 +68,7 @@ namespace D3D12FrameWork {
 		DECLMOVECOPY(Texture);
 
 		bool Init(D3DDevice* dev, TextureDesc const& desc);
+		bool InitStructuredBuffer(D3DDevice* dev, size_t const buffSize);
 		bool InitFromDXImage(D3DDevice* dev,
 			CommandList* cmdList,
 			DirectX::ScratchImage const* image);
@@ -89,6 +91,13 @@ namespace D3D12FrameWork {
 		virtual ID3D12Resource* GetResource()const override {
 			return m_pResource.Get();
 		}
+
+		bool UploadAndCopyStructuredResource(
+			D3DDevice* dev,
+			CommandList* cmdList,
+			uint8_t const* data,
+			size_t const size
+		);
 
 
 	private:

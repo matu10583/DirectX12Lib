@@ -27,7 +27,18 @@ namespace D3D12FrameWork {
 			return m_rootParamsRegDescs[idx];
 		}
 		void Resize(size_t size) {
-			m_rootParamsRegDescs.resize(size);
+			
+		}
+
+		bool Init(std::vector<RootSignature::RSRootParameterDesc> const& _rsRpdesc) {
+			m_rootParamsRegDescs.resize(_rsRpdesc.size());
+			for (int i = 0; i < _rsRpdesc.size(); i++) {
+				auto& rpRegdesc = m_rootParamsRegDescs[i];
+				auto const& rpDesc = _rsRpdesc[i];
+
+				rpRegdesc.RangeDescs.resize(rpDesc.Ranges.size());
+			}
+			return true;
 		}
 
 		template<ShaderBlob::ShaderType T>
@@ -47,7 +58,7 @@ namespace D3D12FrameWork {
 				auto& aBBnd = m_rootParamsRegDescs[paRpd.first].ConstantBindDesc;
 				auto& aTBnd = m_rootParamsRegDescs[paRpd.first].TextureBindDesc;
 				//Globalだけresizeして余分に持っておく．initが終わったらいらない要素に関しては消す
-				m_rootParamsRegDescs[paRpd.first].RangeDescs.resize(aRpd.Ranges.size());
+				//m_rootParamsRegDescs[paRpd.first].RangeDescs.resize(aRpd.Ranges.size());
 				if (aRpd.Ranges.size() != 0 &&
 					aRpd.Ranges[0].Type == D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER) {
 					for (int i = 0; i < aRpd.Ranges.size(); i++) {
@@ -107,7 +118,7 @@ namespace D3D12FrameWork {
 				auto& sBBnd = m_rootParamsRegDescs[psRpd.first].ConstantBindDesc;
 				auto& sTBnd = m_rootParamsRegDescs[psRpd.first].TextureBindDesc;
 				auto const& sRpd = *(psRpd.second);
-				m_rootParamsRegDescs[psRpd.first].RangeDescs.resize(sRpd.Ranges.size());
+				//m_rootParamsRegDescs[psRpd.first].RangeDescs.resize(sRpd.Ranges.size());
 				if (sRpd.Ranges.size() != 0 &&
 					sRpd.Ranges[0].Type == D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER) {//samplerのrpは全部smp
 					for (int i = 0; i < sRpd.Ranges.size(); i++) {

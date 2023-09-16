@@ -109,6 +109,45 @@ namespace D3D12FrameWork {
 	}
 
 	bool 
+		Texture::InitStructuredBuffer(D3DDevice* dev, size_t const buffSize) {
+		D3D12_HEAP_PROPERTIES prop = {};
+		prop.Type = D3D12_HEAP_TYPE_DEFAULT;
+		prop.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+		prop.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+		prop.CreationNodeMask = 0;
+		prop.VisibleNodeMask = 0;
+
+		D3D12_RESOURCE_DESC resDesc = {};
+		resDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+		m_Desc.dimension = TextureDimension::STRUCTURED;
+		resDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+		resDesc.Height = m_Desc.height = 1;
+		resDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+		resDesc.MipLevels = m_Desc.miplevels = 1;
+		resDesc.SampleDesc.Count = m_Desc.sampleCount = 1;
+		resDesc.SampleDesc.Quality = m_Desc.sampleQuality = 0;
+		resDesc.Width = m_Desc.width = buffSize;
+		resDesc.Alignment = 0;
+		resDesc.DepthOrArraySize = m_Desc.depthOrArraySize = 1;
+		resDesc.Format = DXGI_FORMAT_UNKNOWN;
+
+		auto hr = dev->GetDev()->CreateCommittedResource(
+			&prop,
+			D3D12_HEAP_FLAG_NONE,
+			&resDesc,
+			D3D12_RESOURCE_STATE_COPY_DEST,
+			nullptr,
+			IID_PPV_ARGS(m_pResource.ReleaseAndGetAddressOf())
+		);
+		if (FAILED(hr)) {
+			assert(SUCCEEDED(hr));
+			return false;
+		}
+
+		return true;
+	}
+
+	bool 
 		Texture::InitFromPNG(
 		D3DDevice* _dev,
 		CommandList* _cmdList,
@@ -447,6 +486,74 @@ namespace D3D12FrameWork {
 		}
 
 		*ppResource = pUploadSrc;
+		return true;
+	}
+
+	bool 
+		Texture::UploadAndCopyStructuredResource(
+			D3DDevice* dev,
+			CommandList* cmdList,
+			uint8_t const* data,
+			size_t const size
+		) {
+		assert(m_Desc.dimension == TextureDimension::STRUCTURED);
+
+		D3D12_RESOURCE_DESC resDesc = {};
+		resDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+		resDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+		resDesc.Height = m_Desc.height;
+		resDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+		resDesc.MipLevels = m_Desc.miplevels;
+		resDesc.SampleDesc.Count = m_Desc.sampleCount;
+		resDesc.SampleDesc.Quality = m_Desc.sampleQuality;
+		resDesc.Width = m_Desc.width;
+		resDesc.Alignment = 0;
+		resDesc.DepthOrArraySize = m_Desc.depthOrArraySize;
+		resDesc.Format = m_Desc.format;
+		//resDesc = m_pResource->GetDesc();
+
+
+
+		//アップロード用のオブジェクト
+		D3D12_HEAP_PROPERTIES heapProp = {};
+		heapProp.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+		heapProp.CreationNodeMask = 0;
+		heapProp.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+		heapProp.Type = D3D12_HEAP_TYPE_UPLOAD;
+		heapProp.VisibleNodeMask = 0;
+
+		ID3D12Resource* pUploadSrc;
+		auto hr = dev->GetDev()->CreateCommittedResource(
+			&heapProp,
+			D3D12_HEAP_FLAG_NONE,
+			&resDesc,
+			D3D12_RESOURCE_STATE_GENERIC_READ,
+			nullptr,
+			IID_PPV_ARGS(&pUploadSrc)
+		);
+		if (FAILED(hr)) {
+			assert(SUCCEEDED(hr));
+			return false;
+		}
+
+		//リソースをマップしてコピー
+		uint8_t* pMappedSrc;
+		hr = pUploadSrc->Map(0, nullptr, reinterpret_cast<void**>(&pMappedSrc));
+		if (FAILED(hr)) {
+			pUploadSrc->Release();
+			pUploadSrc = nullptr;
+			assert(SUCCEEDED(hr));
+			return false;
+		}
+
+		memcpy(pMappedSrc, data, size);
+
+		cmdList->GetList()->CopyBufferRegion(m_pResource.Get(),
+			0,
+			pUploadSrc, 0,
+			size);
+
+		dev->PendingRelease<ID3D12Resource>(pUploadSrc);
 		return true;
 	}
 

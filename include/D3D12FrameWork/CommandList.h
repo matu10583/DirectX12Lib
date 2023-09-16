@@ -2,6 +2,7 @@
 #include "D3D12FrameWork/ComPtr.h"
 #include "D3D12FrameWork/TextureView.h"
 #include "D3D12FrameWork/GlobalDescriptorHeap.h"
+#include "D3D12FrameWork/Fence.h"
 #include <initializer_list>
 namespace D3D12FrameWork {
 	class CommandQueue;
@@ -57,6 +58,12 @@ public:
 	);
 
 	void End();
+	void Signal(CommandQueue* _queue) {
+		m_fence.Signal(_queue);
+	}
+	void WaitSignal() {
+		m_fence.WaitSignal();
+	}
 
 	void SetViewPort(D3D12_VIEWPORT const* const _vp, uint32_t _numVPs) {
 		m_pCommandList->RSSetViewports(_numVPs,_vp);
@@ -69,6 +76,7 @@ private:
 	ComPtr<ID3D12GraphicsCommandList6> m_pCommandList;
 	ComPtr<ID3D12CommandAllocator> m_pAllocator;
 	unqPtr<GlobalDescriptorHeap> m_rpHeap;
+	Fence m_fence;
 };
 
 }

@@ -35,6 +35,8 @@ namespace D3D12FrameWork {
 			return false;
 		}
 		m_pCommandList->Close();
+
+		m_fence.Init(dev);
 		
 		m_rpHeap.reset(
 			new GlobalDescriptorHeap()
@@ -64,14 +66,16 @@ namespace D3D12FrameWork {
 			return false;
 		}
 		m_pCommandList->Close();
+		m_fence.Init(dev);
 		return true;
 	}
 
 	void CommandList::Term() {
-		
+		m_fence.WaitSignal();
 	}
 
 	void CommandList::Begin() {
+		m_fence.WaitSignal();
 		m_pAllocator->Reset();
 		m_pCommandList->Reset(m_pAllocator.Get(), nullptr);
 	}

@@ -48,6 +48,12 @@ namespace D3D12FrameWork {
 		case D3D12FrameWork::ShaderBlob::GEOMETRY:
 			up_initial = "G"; low_initial = "g";
 			break;
+		case D3D12FrameWork::ShaderBlob::AMPLIFY:
+			up_initial = "A"; low_initial = "a";
+			break;
+		case D3D12FrameWork::ShaderBlob::MESH:
+			up_initial = "M"; low_initial = "m";
+			break;
 		case D3D12FrameWork::ShaderBlob::NONE:
 			break;
 		default:

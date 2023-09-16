@@ -23,7 +23,7 @@ ConstantBuffer<TransformParam> Transform : register(b0);
 
 [numthreads(64,1,1)]
 [outputtopology("triangle")]
-void main(
+void MSmain(
 uint groupIndex: SV_GroupIndex,
 out vertices MSOutput verts[3],
 out indices uint3 tris[1]
@@ -42,7 +42,7 @@ out indices uint3 tris[1]
         float4 worldPos = mul(Transform.World, localPos);
         float4 viewPos = mul(Transform.View, worldPos);
         float4 projPos = mul(Transform.Proj, viewPos);
-        output.Position = projPos;
+        output.Position = localPos;
         output.Color = Vertices[groupIndex].Color;
         verts[groupIndex] = output;
     }

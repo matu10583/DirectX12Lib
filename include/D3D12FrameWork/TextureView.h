@@ -57,6 +57,13 @@ namespace D3D12FrameWork {
 			Texture* _pTexture,
 			UINT _mostDetailedMipL = 0
 		);
+		bool UpdateStructuredBufferView(
+			D3DDevice* _pDev,
+			Texture* _pTexture,
+			size_t _sizeElement,
+			UINT _numElements,
+			UINT _startIndex = 0
+		);
 
 		virtual DescriptorInfo const&
 			GetHeapInfo()const override {

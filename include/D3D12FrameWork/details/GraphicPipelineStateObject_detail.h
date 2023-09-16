@@ -12,7 +12,7 @@ namespace D3D12FrameWork {
 	bool GraphicPipelineStateObject<ST...>::PrepareRootSignature(
 		RootSignature* _pRS
 	) {
-		m_rootParamsRegDescs.Resize(_pRS->GetRootParamDescs().size());
+		m_rootParamsRegDescs.Init(_pRS->GetRootParamDescs());
 		m_defaultRpBuffNames.resize(_pRS->GetRootParamDescs().size());
 		m_pRefRootSignature = _pRS;
 		return true;

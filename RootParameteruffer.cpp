@@ -5,6 +5,7 @@ namespace D3D12FrameWork {
 		RootSignature::RSRootParameterDesc const& rpDesc,
 		D3DDevice* pDev,
 		uint32_t _bufferCount) {
+		//assert(rpRegDesc.RangeDescs.size() != 0);
 		for (auto i = 0u; i < rpRegDesc.RangeDescs.size();i++) {
 			if (rpDesc.Ranges[i].Type == D3D12_DESCRIPTOR_RANGE_TYPE_CBV) {
 				auto tmp = std::make_unique<ConstantBufferSet>();
@@ -46,6 +47,9 @@ namespace D3D12FrameWork {
 				}
 				m_samplerRangeBuffers.emplace_back(std::move(tmp));
 				m_orderedRangeSet.emplace_back(m_samplerRangeBuffers.back().get());
+			}
+			else {
+				assert(false);
 			}
 		}
 		return true;
