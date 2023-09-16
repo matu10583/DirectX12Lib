@@ -52,9 +52,10 @@ namespace D3D12FrameWork {
 			class IPipelineStateObject const* _pso,
 			uint32_t _lambdaBufferCount = DX12Settings::BUFFER_COUNT
 		);
-		void DeleteLambdaRPBuffer(
-			RootParameterBuffer* _deletedPtr
-		);
+
+		RPBufferController GetController(std::string_view _psoName, std::string_view _matName);
+		RPBufferView GetView(std::string_view _psoName, std::string_view _matName);
+
 	private:
 		MaterialFactory()
 			:m_pRefDev(nullptr) {}
@@ -72,15 +73,9 @@ namespace D3D12FrameWork {
 
 		//マテリアルを記憶しておく.psoName:(MaterialName:rpBuff)
 		std::unordered_map<std::string, RootParameterBuffMap> m_psoRpBuffMap;
-		//無名マテリアル。再利用しないであろう位置情報atrixなどに使う。
-		LambdaRPBufferArray m_lambdaRPBuffers;
+
 		D3DDevice* m_pRefDev;
 
-		RootParameterBuffer* CreateLambdaRPBuffer(
-			class IPipelineStateObject const* _pso,//対象となるpso
-			UINT _rpIdx,//そのpsoの何番目のrpのマテリアルを作るのか
-			uint32_t _bufferCount = DX12Settings::BUFFER_COUNT
-		);
 	};
 
 }

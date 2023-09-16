@@ -75,6 +75,9 @@ namespace D3D12FrameWork{
 
 		return true;
 	}
+
+
+
 	bool 
 		TextureSet::CreateResource(D3DDevice* _pdev, std::string_view _regName,
 			TextureDesc const& desc,

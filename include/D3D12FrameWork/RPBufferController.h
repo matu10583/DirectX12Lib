@@ -22,6 +22,11 @@ namespace D3D12FrameWork {
 			uint32_t const mipL=1
 		);
 
+		bool SetTexture(
+			std::string_view regName,
+			TextureDesc const& _texDesc
+		);
+
 		template<typename T>
 		bool SetStructuredBufferOfTexture(
 			//お名前とファイル名．ローダーを別クラスで作っておく

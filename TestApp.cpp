@@ -412,6 +412,8 @@ namespace D3D12FrameWork {
 
 	void
 		TestApp::Draw() {
+		//auto matFac = MaterialFactory::Instance();
+
 		m_device.SyncKill();
 
 		auto pCmdQueue = m_device.GetCmdQueue();
@@ -425,6 +427,14 @@ namespace D3D12FrameWork {
 			D3D12_RESOURCE_STATE_RENDER_TARGET
 		);
 		nowCmdList.SetGraphicPipeline(&m_pso);
+
+		//auto texView = matFac->GetView(m_pso.GetName(), "testMaterial0");
+		//auto rtv = texView.TextureRTV("g_texture");
+		//nowCmdList.SetAndClearRenderTargets(
+		//	rtv,
+		//	1,
+		//	{ 1.0,0.25f,0.25f,1.0f }
+		//);
 
 		nowCmdList.SetAndClearRenderTargets(
 			m_device.GetSwapChain()->GetCurrentRTV(),

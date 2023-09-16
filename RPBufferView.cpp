@@ -1,6 +1,7 @@
 #include "D3D12FrameWork/RPBufferView.h"
 #include "D3D12FrameWork/RootParameterBuffer.h"
 #include "D3D12FrameWork/ConstantBufferSet.h"
+#include "D3D12FrameWork/TextureView.h"
 
 
 namespace D3D12FrameWork{
@@ -32,5 +33,12 @@ namespace D3D12FrameWork{
 			ret += range->NumViews();
 		}
 		return ret;
+	}
+
+	RenderTargetView const* 
+		RPBufferView::TextureRTV(std::string_view _regName) {
+		auto tex_set = m_rpBuffer.get().FindTextureFromRegisterName(_regName);
+		auto rtv = tex_set->GetRenderTargetView(_regName);
+		return rtv;
 	}
 }

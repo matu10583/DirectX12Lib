@@ -37,6 +37,26 @@ namespace D3D12FrameWork{
 		return true;
 	}
 
+
+	bool 
+		RPBufferController::SetTexture(
+			std::string_view regName,
+			TextureDesc const& _texDesc
+		) {
+		auto tex = m_rpBuff.get().FindTextureFromRegisterName(regName);
+		if (tex == nullptr) {
+			assert(false);
+			return false;
+		}
+		if (!tex->CreateResource(
+			m_pRefDev, regName, _texDesc, true
+		)) {
+			return false;
+		}
+		return true;
+	}
+
+
 	bool
 		RPBufferController::SetSampler(
 			std::string_view regName,

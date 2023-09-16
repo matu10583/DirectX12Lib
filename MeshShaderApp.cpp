@@ -325,31 +325,6 @@ namespace D3D12FrameWork {
 
 		auto material = m_renderComponent->Material(0);
 
-		//material->GetController(0).SetVariable<float>("num", 1.1f, true);
-		//material->GetController(0).SetTexture("g_texture", "res/texture/Desktop.png");
-		//cont.GetHandler(1).SetSampler("g_sampler", smp_desc);
-
-
-		//MeshFactory::Create(&m_device);
-		//auto meshFac = MeshFactory::Instance();
-		//meshFac->CreateMesh(
-		//	"test_mesh",
-		//	&m_pso
-		//);
-		//meshFac->CreateMesh(
-		//	"test_fbx",
-		//	&m_pso
-		//);
-		//auto vertices = std::span<BasicVertexM>();
-		//auto indices = std::span<unsigned short>();
-		////ModelLoader<BasicVertex>::Load(
-		////	"res/model/ac_guitar.fbx", vertices, indices
-		////);
-
-
-		//m_renderComponent->CreateMeshSet("test_mesh");
-		//auto mesh = m_renderComponent->Mesh();
-
 		//vb‚Ìì»(‚ ‚Æ‚Å•ÏX‚·‚éD)
 		std::vector<BasicVertexM> triangleVertices;
 		triangleVertices.emplace_back(

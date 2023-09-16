@@ -25,6 +25,10 @@ namespace D3D12FrameWork {
 			return &m_rpBuffer.get();
 		}
 
+		class RenderTargetView const* TextureRTV(std::string_view _regName);
+
+
+
 	private:
 		std::reference_wrapper<RootParameterBuffer> const m_rpBuffer;
 	};

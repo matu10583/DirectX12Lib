@@ -47,8 +47,8 @@ namespace D3D12FrameWork {
 		//ここはrpの順番通りに並べる．ここはrpbufferへの参照ではなくhandlerを持たせた方がいい．
 		std::vector<RPBufferController> m_materialControllers;
 		std::vector<RPBufferView> m_materialViews;
-		//lambdaなbufferについてはMaterialSetが死んだときに破壊する。
-		std::vector<unsigned int> m_lambdaIdx;
+		//lambdaなbufferについては自分で所有権を持つ
+		std::vector<unqPtr<RootParameterBuffer>> m_plambdaBuff;
 	};
 }
 

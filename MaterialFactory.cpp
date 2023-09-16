@@ -70,10 +70,16 @@ namespace D3D12FrameWork{
 
 			if (matName.empty()) {
 				//無名バッファを作る。
-				matBuffer = CreateLambdaRPBuffer(
-					_pso, i, _lambdaBufferCount
-				);
-				ret->m_lambdaIdx.push_back(i);
+				ret->m_plambdaBuff.emplace_back(std::move(
+					std::make_unique<RootParameterBuffer>()
+				));
+				auto const& rprDesc = _pso->GetRPRegisterDesc(i);
+				auto const& rsRpDesc = _pso->GetRootSignature()->GetRootParamDescs();
+				matBuffer = ret->m_plambdaBuff.back().get();
+				if (!matBuffer->Init(rprDesc, rsRpDesc[i], m_pRefDev, _lambdaBufferCount)) {
+					assert(false);
+					return nullptr;
+				}
 			}
 			else {
 				auto psoName = _pso->GetName();
@@ -105,35 +111,42 @@ namespace D3D12FrameWork{
 		return ret;
 	}
 
-	RootParameterBuffer*
-		MaterialFactory::CreateLambdaRPBuffer(
-		IPipelineStateObject const* _pso,//対象となるpso
-		UINT _rpIdx,//そのpsoの何番目のrpのマテリアルを作るのか
-		uint32_t _bufferCount
-	) {
-		m_lambdaRPBuffers.LambdaRPBuffers
-			.emplace_back(std::make_unique<RootParameterBuffer>());
-		auto rpBuff = m_lambdaRPBuffers.LambdaRPBuffers.back().get();
-		auto const& rprDesc = _pso->GetRPRegisterDesc(_rpIdx);
-		auto const& rsRpDesc = _pso->GetRootSignature()->GetRootParamDescs();
-		if (!rpBuff->Init(rprDesc, rsRpDesc[_rpIdx], m_pRefDev, _bufferCount)) {
-			assert(false);
-			return nullptr;
+	RPBufferController 
+		MaterialFactory::GetController(std::string_view _psoName, std::string_view _matName) {
+		if (!m_psoRpBuffMap.count(_psoName.data())) {
+			throw std::runtime_error("指定されたpsoで使用されるマテリアルは一つも登録されていません．");
+
+			//そのpsoのマテリアルは一つもない．
 		}
-		return rpBuff;
+		auto& rpBMap = m_psoRpBuffMap[_psoName.data()].RPBuffs;
+		if (!rpBMap.count(_matName.data())) {
+			//未作成のマテリアル
+			throw std::runtime_error("未作成のマテリアル");
+
+		}
+		auto matBuffer = rpBMap[_matName.data()].get();
+		return RPBufferController(
+				*matBuffer, m_pRefDev
+		);
+	}
+	RPBufferView 
+		MaterialFactory::GetView(std::string_view _psoName, std::string_view _matName) {
+		if (!m_psoRpBuffMap.count(_psoName.data())) {
+			throw std::runtime_error("指定されたpsoで使用されるマテリアルは一つも登録されていません．");
+
+			//そのpsoのマテリアルは一つもない．
+		}
+		auto& rpBMap = m_psoRpBuffMap[_psoName.data()].RPBuffs;
+		if (!rpBMap.count(_matName.data())) {
+			//未作成のマテリアル
+			throw std::runtime_error("未作成のマテリアル");
+
+		}
+		auto matBuffer = rpBMap[_matName.data()].get();
+		return RPBufferView(
+			*matBuffer
+		);
 	}
 
-	void
-		MaterialFactory::DeleteLambdaRPBuffer(
-			RootParameterBuffer* _deletedBuffer
-		) {
-		auto it = std::find_if(m_lambdaRPBuffers.LambdaRPBuffers.begin(),
-			m_lambdaRPBuffers.LambdaRPBuffers.end(),
-			[_deletedBuffer](auto const& ptr) {
-				return ptr.get() == _deletedBuffer;
-			});
-		if (it != m_lambdaRPBuffers.LambdaRPBuffers.end()) {
-			m_lambdaRPBuffers.LambdaRPBuffers.erase(it);
-		}
-	}
+
 }

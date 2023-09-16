@@ -56,7 +56,7 @@ namespace D3D12FrameWork {
 		}
 
 		_pDev->GetDev()->CreateRenderTargetView(
-			_pTexture->GetRes(),
+			_pTexture->GetResource(),
 			&vdesc,
 			m_descInfo.m_CpuHandle
 		);
@@ -128,7 +128,7 @@ namespace D3D12FrameWork {
 
 		vdesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 		_pDev->GetDev()->CreateShaderResourceView(
-			_pTexture->GetRes(),
+			_pTexture->GetResource(),
 			&vdesc,
 			m_descInfo.m_CpuHandle
 		);
@@ -155,7 +155,7 @@ namespace D3D12FrameWork {
 		vdesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 
 		_pDev->GetDev()->CreateShaderResourceView(
-			_pTexture->GetRes(),
+			_pTexture->GetResource(),
 			&vdesc,
 			m_descInfo.m_CpuHandle
 		);

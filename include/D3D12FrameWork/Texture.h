@@ -85,9 +85,9 @@ namespace D3D12FrameWork {
 		auto& GetTextureDesc()const {
 			return m_Desc;
 		}
-		ID3D12Resource* GetRes()const{
-			return m_pResource.Get();
-		}
+		//ID3D12Resource* GetRes()const{
+		//	return m_pResource.Get();
+		//}
 		virtual ID3D12Resource* GetResource()const override {
 			return m_pResource.Get();
 		}
