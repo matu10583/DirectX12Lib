@@ -1,3 +1,0 @@
-
-		CommandList* pCmdLists[] = {&pNowCmdList};
-		m_device.ExecuteCommandList(pCmdLists, ARRAYSIZE(pCmdLists));

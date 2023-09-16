@@ -400,3 +400,5 @@ FodyWeavers.xsd
 #dx12関連
 *.cso
 *.pdb
+External/
+res/
