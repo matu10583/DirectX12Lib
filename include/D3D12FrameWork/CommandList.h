@@ -26,7 +26,7 @@ public:
 
 	void Begin();
 
-	//Getter
+	//Gette
 	auto GetList()const {
 		return m_pCommandList.Get();
 	}

@@ -42,6 +42,20 @@ namespace D3D12FrameWork {
 			return true;
 		}
 
+		bool SetIndices(
+			std::span<uint32_t>const _indices) {
+			m_cmdList.Begin();
+			if (!m_meshBuff.get().SetIndices(
+				m_pRefDev, &m_cmdList, _indices
+			)) {
+				assert(false);
+				return false;
+			}
+			CommandList* pCmdList[] = { &m_cmdList };
+			m_pRefDev->EndAndExecuteCommandList(pCmdList, 1);
+			return true;
+		}
+
 		//template<typename T>
 		//bool SetVertices(
 		//	std::filesystem::path const& _path,

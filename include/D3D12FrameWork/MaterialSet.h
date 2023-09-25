@@ -12,6 +12,8 @@ namespace D3D12FrameWork {
 	struct MaterialSetDescriptor
 	{
 		std::vector<MaterialDescriptor> MaterialDescs;
+		//0ならindicesを使わずにvertex全部を一気に描画する
+		uint32_t NumIndices = 0;
 	};
 	class RPBufferController;
 	class RPBufferView;
@@ -42,6 +44,12 @@ namespace D3D12FrameWork {
 			assert(m_materialControllers.size() == m_materialViews.size());
 			return m_materialViews.size();
 		}
+		uint32_t IndicesNum()const {
+			return m_indicesNum;
+		}
+		void SetIndicesNum(uint32_t const _indicesNum) {
+			m_indicesNum = _indicesNum;
+		}
 
 	private:
 		//ここはrpの順番通りに並べる．ここはrpbufferへの参照ではなくhandlerを持たせた方がいい．
@@ -49,6 +57,8 @@ namespace D3D12FrameWork {
 		std::vector<RPBufferView> m_materialViews;
 		//lambdaなbufferについては自分で所有権を持つ
 		std::vector<unqPtr<RootParameterBuffer>> m_plambdaBuff;
+		//インデックス数
+		uint32_t  m_indicesNum;
 	};
 }
 

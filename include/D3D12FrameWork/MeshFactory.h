@@ -38,8 +38,7 @@ namespace D3D12FrameWork {
 		//作るのはまとめて最初の方に作る．作ったメッシュはmapで保存．
 		MeshFactory* CreateMesh(
 			std::string_view _matName,//作るメッシュの名前
-			class IPipelineStateObject* _pso,//対象となるpso
-			bool useIndex = false
+			class IPipelineStateObject* _pso//対象となるpso
 		);
 		MeshBufferController MeshController(
 			std::string_view _matName,

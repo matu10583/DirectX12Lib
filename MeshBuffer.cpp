@@ -4,8 +4,7 @@
 namespace D3D12FrameWork {
 	bool
 		MeshBuffer::Init(
-			ShaderInputDescs const& inputDesc,
-			bool useIndex
+			ShaderInputDescs const& inputDesc
 		) {
 		//‚ ‚Ü‚èİ’è‚·‚×‚«‚±‚Æ‚ª‚È‚¢‚ËBB
 		m_numInstances = 1;
@@ -15,9 +14,7 @@ namespace D3D12FrameWork {
 		for (auto& vb : m_vertexBuffs) {
 			vb.reset(new VertexBuffer());
 		}
-		if (useIndex) {//indexg‚¤‚È‚ç‰Šú‰»
-
-		}
+		m_indexBuff.reset(new IndexBuffer());
 
 		return true;
 	}

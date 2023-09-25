@@ -11,12 +11,11 @@ namespace D3D12FrameWork{
 	MeshFactory*
 		MeshFactory::CreateMesh(
 			std::string_view _meshName,
-			IPipelineStateObject* _pso,
-			bool useIndex
+			IPipelineStateObject* _pso
 		) {
 		auto const& inputDesc = _pso->GetInputDesc();
 		auto tmpMB = std::make_unique<MeshBuffer>();
-		if (!tmpMB->Init(inputDesc, useIndex)) {
+		if (!tmpMB->Init(inputDesc)) {
 			assert(false);
 			return nullptr;
 		}

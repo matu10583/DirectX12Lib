@@ -162,31 +162,52 @@ namespace D3D12FrameWork {
 		CommandList::Draw(
 			RenderComponent * _pRc, D3DDevice* _pDev
 		) {
-		bool isLayoutStable = true;
-
-		//後でindexを使う際はマテリアル毎にメッシュを分けて描画するようにする。
-		auto const matSize = _pRc->Material(0)->Size();
-		for (int i = 0; i < matSize; i++) {
-			auto const& matView = _pRc->Material(0)->GetView(i);
-			//rootparameterにコピー.isLayoutStableはglobalheapchankの場所が変わっているかを表すけどいるのか？
-			isLayoutStable = isLayoutStable && m_rpHeap->CopyToHeapChank(_pDev,
-				matView.GetCopyDesc(),
-				i,
-				matView.GetType()
-			);
-		}
-		//rootparameterのセット
-		SetGlobalDescriptorHeap();
-
 		//本当なら入る描画処理
-		m_pCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		m_pCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 		auto const& meshView = _pRc->Mesh()->GetView();
 		auto vbv = meshView.GetVBViews();
 		m_pCommandList->IASetVertexBuffers(0, static_cast<UINT>(vbv.size()), vbv.data());
+		if (_pRc->Material(0)->IndicesNum() != 0) {
+			m_pCommandList->IASetIndexBuffer(meshView.GetIBView());
+		}
 
-		m_pCommandList->DrawInstanced(meshView.NumVertices(), meshView.NumInstances(), 0, 0);
+		auto index_offset = 0;
 
-		_pRc->AfterDraw(0);
+		for (auto matSetIdx = 0u; matSetIdx < _pRc->NumMaterialSet(); matSetIdx++) {
+			bool isLayoutStable = true;
+
+			//後でindexを使う際はマテリアル毎にメッシュを分けて描画するようにする。
+			auto const& mat = _pRc->Material(matSetIdx);
+			auto const matSize = mat->Size();
+			for (int i = 0; i < matSize; i++) {
+				auto const& matView = mat->GetView(i);
+				//rootparameterにコピー.isLayoutStableはglobalheapchankの場所が変わっているかを表すけどいるのか？
+				isLayoutStable = isLayoutStable && m_rpHeap->CopyToHeapChank(_pDev,
+					matView.GetCopyDesc(),
+					i,
+					matView.GetType()
+				);
+			}
+			//rootparameterのセット
+			SetGlobalDescriptorHeap();
+
+			//要素が一つだけの時はindices num=0でも許す
+			if (mat->IndicesNum()==0 &&
+				_pRc->NumMaterialSet() == 1) {
+				m_pCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+				m_pCommandList->DrawInstanced(meshView.NumVertices(), meshView.NumInstances(), 0, 0);
+				_pRc->AfterDraw(matSetIdx);
+				continue;
+			}
+			assert(mat->IndicesNum() != 0);
+			
+			m_pCommandList->DrawIndexedInstanced(
+				mat->IndicesNum(), meshView.NumInstances(), index_offset, 0, 0);
+			index_offset += mat->IndicesNum();
+			_pRc->AfterDraw(0);
+		}
+		
+
 	}
 	void
 		CommandList::DrawMesh(

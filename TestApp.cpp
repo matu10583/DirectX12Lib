@@ -245,7 +245,7 @@ namespace D3D12FrameWork {
 		GraphicPipelineStateDesc psDesc{
 			.RasterizerState{
 				.FillMode = D3D12_FILL_MODE_SOLID,
-				.CullMode = D3D12_CULL_MODE_NONE,
+				.CullMode = D3D12_CULL_MODE_BACK,
 				.DepthClipEnable = true,
 				.MultisampleEnable = false
 			},
@@ -314,8 +314,8 @@ namespace D3D12FrameWork {
 			5, true
 		);
 
-
 		std::array<MaterialSetDescriptor, 1> matsetdesc;
+		matsetdesc[0].NumIndices = 3;
 		m_renderComponent.reset(new RenderComponent(m_pso));
 		m_renderComponent->CreateMaterialSet(matsetdesc);
 
@@ -350,17 +350,23 @@ namespace D3D12FrameWork {
 		//vbÇÃçÏêª(Ç†Ç∆Ç≈ïœçXÇ∑ÇÈÅD)
 		std::vector<BasicVertex> triangleVertices;
 		triangleVertices.emplace_back(
-			BasicVertex(Vector4(-1.0f, -1.0f, 0.0f, 1.0f), { 1.0f,0.0f,0.0f,1.0f })
+			BasicVertex(Vector4(-1.0f, 1.0f, 0.0f, 1.0f), { 0.0f,0.0f,1.0f,1.0f })
 		);
 		triangleVertices.emplace_back(
-			BasicVertex(Vector4(-1.0f, 1.0f, 0.0f, 1.0f), { 0.0f,0.0f,1.0f,1.0f })
+			BasicVertex(Vector4(-1.0f, -1.0f, 0.0f, 1.0f), { 1.0f,0.0f,0.0f,1.0f })
 		);
 		triangleVertices.emplace_back(
 			BasicVertex(Vector4(1.0f, -1.0f, 0.0f, 1.0f), { 0.0f,1.0f,0.0f,1.0f })
 		);
 		mesh->GetController().SetVertices<BasicVertex>(
 			triangleVertices, 0
-			);
+		);
+		//ib
+		std::vector<uint32_t> triangleIndices;
+		triangleIndices.emplace_back(1);
+		triangleIndices.emplace_back(0);
+		triangleIndices.emplace_back(2);
+		mesh->GetController().SetIndices(triangleIndices);
 
 		return true;
 	}

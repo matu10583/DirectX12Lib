@@ -21,6 +21,7 @@ namespace D3D12FrameWork {
 		RootParameterCopyDesc GetCopyDesc()const;
 		enum RPBufferType const GetType()const;
 		size_t const GetNumViews()const;
+		uint32_t const GetNumIndices()const;
 		RootParameterBuffer* GetRPBuff()const {
 			return &m_rpBuffer.get();
 		}

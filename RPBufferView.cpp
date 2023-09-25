@@ -35,6 +35,7 @@ namespace D3D12FrameWork{
 		return ret;
 	}
 
+
 	RenderTargetView const* 
 		RPBufferView::TextureRTV(std::string_view _regName) {
 		auto tex_set = m_rpBuffer.get().FindTextureFromRegisterName(_regName);

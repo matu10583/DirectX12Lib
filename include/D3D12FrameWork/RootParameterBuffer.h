@@ -23,6 +23,7 @@ namespace D3D12FrameWork {
 		RootParameterBuffer() = default;
 		virtual ~RootParameterBuffer() = default;
 		DECLMOVECOPY(RootParameterBuffer);
+		//indices num‚ª0‚È‚çindex‚ðŽg‚í‚È‚¢‚ÆŽv‚Á‚Ä‚­‚¾‚³‚¢
 		bool Init(RootParamRegisterDesc const&,
 			RootSignature::RSRootParameterDesc const&,
 			D3DDevice*,
@@ -109,7 +110,6 @@ namespace D3D12FrameWork {
 		std::vector<unqPtr<ConstantBufferSet>> m_constantRangeBuffers;
 		std::vector<unqPtr<TextureSet>> m_textureRangeBuffers;
 		std::vector<unqPtr<SamplerSet>> m_samplerRangeBuffers;
-
 
 	};
 }

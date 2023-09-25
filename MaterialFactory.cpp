@@ -47,6 +47,7 @@ namespace D3D12FrameWork{
 			uint32_t _lambdaBufferCount
 		) {
 		auto ret = std::make_unique<MaterialSet>();
+		ret->m_indicesNum = _matSetDesc.NumIndices;
 		auto rpNum = _pso->GetRootSignature()->GetRootParamDescs().size();
 		ret->m_materialControllers.clear();
 		ret->m_materialControllers.reserve(rpNum);

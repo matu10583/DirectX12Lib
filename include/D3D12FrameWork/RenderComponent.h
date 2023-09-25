@@ -35,6 +35,10 @@ namespace D3D12FrameWork {
 				m_pMaterialSets[_index]->GetController(i).AfterDraw();
 			}
 		}
+
+		size_t NumMaterialSet()const {
+			return m_pMaterialSets.size();
+		}
 	private:
 		std::vector<unqPtr<MaterialSet>> m_pMaterialSets;
 		unqPtr<MeshSet> m_pMeshSet;

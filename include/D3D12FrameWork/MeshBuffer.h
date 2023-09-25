@@ -2,6 +2,7 @@
 #include "D3D12FrameWork/Common.h"
 #include "D3D12FrameWork/ComPtr.h"
 #include "D3D12FrameWork/VertexBuffer.h"
+#include "D3D12FrameWork/IndexBuffer.h"
 #include <span>
 
 namespace D3D12FrameWork {
@@ -19,8 +20,7 @@ namespace D3D12FrameWork {
 		DECLMOVECOPY(MeshBuffer);
 
 		bool Init(
-			class ShaderInputDescs const&,
-			bool useIndex
+			class ShaderInputDescs const&
 		);
 
 		template<typename T>
@@ -46,9 +46,22 @@ namespace D3D12FrameWork {
 				);
 		}
 
+		bool SetIndices(
+			D3DDevice* _pDev,
+			CommandList* _pCmdList,
+			std::span<uint32_t> const _indices
+		) {
+			return m_indexBuff->SetIndices(
+				_pDev, _pCmdList, _indices
+			);
+		}
+
 		auto* const GetVBView(uint32_t _slotNum)const {
 			assert(m_vertexBuffs.size() > _slotNum);
 			return m_vertexBuffs[_slotNum]->GetVBView();
+		}
+		auto* const GetIBView()const {
+			return m_indexBuff->GetIBView();
 		}
 		auto SlotNum()const {
 			return m_vertexBuffs.size();
@@ -59,16 +72,11 @@ namespace D3D12FrameWork {
 		auto InstancesNum()const {
 			return m_numInstances;
 		}
-		auto IndicesNum(uint32_t _index)const {
-			//indexの数を返す。複数のマテリアルに分かれる場合はn番目のマテリアルを適用するindexの数
-			return 0;
-		}
+
 	private:
 		std::vector<unqPtr<VertexBuffer>> m_vertexBuffs;
 		uint32_t m_numVerts;
 		uint32_t m_numInstances;
-		//unqPtr<IndexBuffer> m_indexBuff;
+		unqPtr<IndexBuffer> m_indexBuff;
 	};
 }
-
-

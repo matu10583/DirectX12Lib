@@ -20,6 +20,7 @@ namespace D3D12FrameWork {
 
 		std::vector<D3D12_VERTEX_BUFFER_VIEW> const GetVBViews() const;
 		D3D12_VERTEX_BUFFER_VIEW const* const GetVBView(uint32_t _slotNum) const;
+		D3D12_INDEX_BUFFER_VIEW const* const GetIBView()const;
 		uint32_t NumVertices()const;
 		uint32_t NumInstances()const;
 		uint32_t NumIndices(uint32_t _index)const;

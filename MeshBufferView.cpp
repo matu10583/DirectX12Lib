@@ -16,6 +16,10 @@ namespace D3D12FrameWork{
 		MeshBufferView::GetVBView(uint32_t _slotNum)const {
 		return m_meshBuff.get().GetVBView(_slotNum);
 	}
+	D3D12_INDEX_BUFFER_VIEW const* const
+		MeshBufferView::GetIBView()const {
+		return m_meshBuff.get().GetIBView();
+	}
 
 	uint32_t 
 		MeshBufferView::NumVertices()const {
@@ -25,8 +29,5 @@ namespace D3D12FrameWork{
 		MeshBufferView::NumInstances()const {
 		return m_meshBuff.get().InstancesNum();
 	}
-	uint32_t
-		MeshBufferView::NumIndices(uint32_t _index)const {
-		return m_meshBuff.get().IndicesNum(_index);
-	}
+
 }
