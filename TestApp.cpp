@@ -347,7 +347,7 @@ namespace D3D12FrameWork {
 		m_renderComponent->CreateMeshSet("test_mesh");
 		auto mesh = m_renderComponent->Mesh();
 
-		//vb‚Ìì»(‚ ‚Æ‚Å•ÏX‚·‚éD)
+		//vb‚Ìì»
 		std::vector<BasicVertex> triangleVertices;
 		triangleVertices.emplace_back(
 			BasicVertex(Vector4(-1.0f, 1.0f, 0.0f, 1.0f), { 0.0f,0.0f,1.0f,1.0f })
