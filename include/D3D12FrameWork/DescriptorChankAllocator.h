@@ -59,6 +59,7 @@ namespace D3D12FrameWork {
 		uint32_t m_hItemEnd;
 		uint32_t m_numDesc;
 		D3D12_DESCRIPTOR_HEAP_TYPE m_type;
+		bool m_isGPUVisible;
 	};	
 
 

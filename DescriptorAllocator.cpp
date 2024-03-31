@@ -39,7 +39,13 @@ namespace D3D12FrameWork{
 		}
 		m_IncrementSize = dev->GetDev()->GetDescriptorHandleIncrementSize(desc.Type);
 		m_hCpuHead = m_pHeap->GetCPUDescriptorHandleForHeapStart();
-		m_hGpuHead = m_pHeap->GetGPUDescriptorHandleForHeapStart();
+		if (desc.Flags & D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE) {
+			m_hGpuHead = m_pHeap->GetGPUDescriptorHandleForHeapStart();
+			m_isGPUVisible = true;
+		}
+		else {
+			m_isGPUVisible = false;
+		}
 
 		//ƒƒ‚ƒŠŠÇ—î•ñ‚Ìì»
 		m_pBuffer = std::make_unique<uint8_t[]>(
@@ -81,8 +87,13 @@ namespace D3D12FrameWork{
 		retInfo.m_pItem = m_pFreeList;
 		retInfo.m_CpuHandle = m_hCpuHead;
 		retInfo.m_CpuHandle.ptr += m_IncrementSize * idx;
-		retInfo.m_GpuHandle = m_hGpuHead;
-		retInfo.m_GpuHandle.ptr += m_IncrementSize * idx;
+		if (m_isGPUVisible) {
+			retInfo.m_GpuHandle = m_hGpuHead;
+			retInfo.m_GpuHandle.ptr += m_IncrementSize * idx;
+		}
+		else {
+			retInfo.m_GpuHandle.ptr = 0;
+		}
 		retInfo.m_pAllocator = this;
 
 		//‹ó‚«î•ñXV

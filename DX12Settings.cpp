@@ -8,7 +8,7 @@ namespace D3D12FrameWork{
 	//égÇÌÇ»Ç¢Ç∆évÇ§ÅB
 	const std::string DX12Settings::VS_VERSION = "vs_5_0";
 	const std::string DX12Settings::PS_VERSION = "ps_5_0";
-	const DX12Settings::ShaderVersion DX12Settings::SHADER_VERSION = DX12Settings::VERSION_6_5;
+	const DX12Settings::ShaderVersion DX12Settings::SHADER_VERSION = DX12Settings::VERSION_6_0;
 
 	
 

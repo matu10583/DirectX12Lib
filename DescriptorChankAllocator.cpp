@@ -34,7 +34,10 @@ namespace D3D12FrameWork{
 			_desc.Type
 		);
 		m_hCpuHead = m_pHeap->GetCPUDescriptorHandleForHeapStart();
-		m_hGpuHead = m_pHeap->GetGPUDescriptorHandleForHeapStart();
+		m_isGPUVisible = _desc.Flags & D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+		if (m_isGPUVisible) {
+			m_hGpuHead = m_pHeap->GetGPUDescriptorHandleForHeapStart();
+		}
 
 		m_hItemEnd = _desc.NumDescriptors * m_IncrementSize;
 
@@ -77,8 +80,13 @@ namespace D3D12FrameWork{
 		ret.itItem = itAllocedItem;
 		ret.CpuHandle = m_hCpuHead;
 		ret.CpuHandle.ptr += itAllocedItem->m_ItemHandleForStart;
-		ret.GpuHandle = m_hGpuHead;
-		ret.GpuHandle.ptr += itAllocedItem->m_ItemHandleForStart;
+		if (m_isGPUVisible) {
+			ret.GpuHandle = m_hGpuHead;
+			ret.GpuHandle.ptr += itAllocedItem->m_ItemHandleForStart;
+		}
+		else {
+			ret.GpuHandle.ptr = 0;
+		}
 
 		//ItemƒŠƒXƒg‚ð®—
 		itAllocedItem->m_isAllocated = true;

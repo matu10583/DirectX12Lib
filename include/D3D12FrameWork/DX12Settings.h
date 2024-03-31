@@ -11,6 +11,7 @@ namespace D3D12FrameWork {
 		enum ShaderVersion
 		{
 			VERSION_5_0,
+			VERSION_6_0,
 			VERSION_6_5
 		};
 		//static const uint32_t BUFFER_COUNT;

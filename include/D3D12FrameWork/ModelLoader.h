@@ -1,4 +1,5 @@
 #pragma once
+/*
 #include "D3D12FrameWork/ComPtr.h"
 #include "D3D12FrameWork/Common.h"
 #include <unordered_map>
@@ -120,3 +121,4 @@ std::unordered_map<std::string, std::function<bool(char const*, std::span<T>&,
 }
 
 
+*/

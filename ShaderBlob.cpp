@@ -68,6 +68,9 @@ namespace D3D12FrameWork {
 		case D3D12FrameWork::DX12Settings::VERSION_6_5:
 			version = "6_5";
 			break;
+		case D3D12FrameWork::DX12Settings::VERSION_6_0:
+			version = "6_0";
+			break;
 		default:
 			break;
 		}

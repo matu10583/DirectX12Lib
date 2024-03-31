@@ -15,7 +15,7 @@
 #include "D3D12FrameWork/RenderComponent.h"
 #include "D3D12FrameWork/GlobalDescriptorHeap.h"
 #include "D3D12FrameWork/MeshFactory.h"
-#include "D3D12FrameWork/ModelLoader.h"
+//#include "D3D12FrameWork/ModelLoader.h"
 
 #include <cassert>
 #include <filesystem>

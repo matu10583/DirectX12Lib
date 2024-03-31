@@ -1,13 +1,11 @@
 #pragma once
 #include <d3d12shader.h>
 #include <d3dcompiler.h>
-#include "dxc/dxcapi.h"
+#include <dxcapi.h>
 #include "D3D12FrameWork/Common.h"
 #include "D3D12FrameWork/ComPtr.h"
 #include <tuple>
 
-
-#pragma comment(lib, "dxcompiler")
 namespace D3D12FrameWork {
 	
 	enum ShaderCompileOption

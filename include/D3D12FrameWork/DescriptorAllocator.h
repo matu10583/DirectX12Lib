@@ -59,8 +59,7 @@ namespace D3D12FrameWork {
 		uint32_t m_IncrementSize;
 		D3D12_DESCRIPTOR_HEAP_DESC m_HeapDesc;
 		ComPtr<ID3D12DescriptorHeap> m_pHeap;
-
-
+		bool m_isGPUVisible;
 	};
 
 }

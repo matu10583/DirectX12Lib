@@ -12,8 +12,6 @@
 #include "D3D12FrameWork/ShaderBindInfo.h"
 #include "D3D12FrameWork/DX12Settings.h"
 
-//#pragma comment(lib, "d3dcompiler.lib")
-//#pragma comment(lib, "dxguid.lib")
 
 namespace D3D12FrameWork {
 	class IBlobObject {

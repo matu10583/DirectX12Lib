@@ -2,7 +2,7 @@
 #include "D3D12FrameWork/Common.h"
 #include "D3D12FrameWork/CommandList.h"
 #include "D3D12FrameWork/MeshBuffer.h"
-#include "D3D12FrameWork/ModelLoader.h"
+//#include "D3D12FrameWork/ModelLoader.h"
 #include <span>
 
 namespace D3D12FrameWork {

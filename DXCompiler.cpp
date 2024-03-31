@@ -8,7 +8,6 @@
 #include "D3D12FrameWork/Common.h"
 #include "D3D12FrameWork/File.h"
 #include "D3D12FrameWork/util/wcharUtil.h"
-#include "dxc/DxilContainer/DxilContainer.h"
 
 
 namespace {
@@ -24,6 +23,44 @@ namespace {
 #endif // define
 		return false;
 	}
+
+	// from https://github.com/microsoft/DirectXShaderCompiler/blob/main/include/dxc/DxilContainer/DxilContainer.h
+#define DXIL_FOURCC(ch0, ch1, ch2, ch3)                                        \
+  ((uint32_t)(uint8_t)(ch0) | (uint32_t)(uint8_t)(ch1) << 8 |                  \
+   (uint32_t)(uint8_t)(ch2) << 16 | (uint32_t)(uint8_t)(ch3) << 24)
+
+	enum DxilFourCC {
+		DFCC_Container = DXIL_FOURCC(
+			'D', 'X', 'B',
+			'C'), // for back-compat with tools that look for DXBC containers
+		DFCC_ResourceDef = DXIL_FOURCC('R', 'D', 'E', 'F'),
+		DFCC_InputSignature = DXIL_FOURCC('I', 'S', 'G', '1'),
+		DFCC_OutputSignature = DXIL_FOURCC('O', 'S', 'G', '1'),
+		DFCC_PatchConstantSignature = DXIL_FOURCC('P', 'S', 'G', '1'),
+		DFCC_ShaderStatistics = DXIL_FOURCC('S', 'T', 'A', 'T'),
+		DFCC_ShaderDebugInfoDXIL = DXIL_FOURCC('I', 'L', 'D', 'B'),
+		DFCC_ShaderDebugName = DXIL_FOURCC('I', 'L', 'D', 'N'),
+		DFCC_FeatureInfo = DXIL_FOURCC('S', 'F', 'I', '0'),
+		DFCC_PrivateData = DXIL_FOURCC('P', 'R', 'I', 'V'),
+		DFCC_RootSignature = DXIL_FOURCC('R', 'T', 'S', '0'),
+		DFCC_DXIL = DXIL_FOURCC('D', 'X', 'I', 'L'),
+		DFCC_PipelineStateValidation = DXIL_FOURCC('P', 'S', 'V', '0'),
+		DFCC_RuntimeData = DXIL_FOURCC('R', 'D', 'A', 'T'),
+		DFCC_ShaderHash = DXIL_FOURCC('H', 'A', 'S', 'H'),
+		DFCC_ShaderSourceInfo = DXIL_FOURCC('S', 'R', 'C', 'I'),
+		DFCC_ShaderPDBInfo = DXIL_FOURCC('P', 'D', 'B', 'I'),
+		DFCC_CompilerVersion = DXIL_FOURCC('V', 'E', 'R', 'S'),
+	};
+
+#undef DXIL_FOURCC
+
+	struct DxilShaderDebugName {
+		uint16_t Flags;      // Reserved, must be set to zero.
+		uint16_t NameLength; // Length of the debug name, without null terminator.
+		// Followed by NameLength bytes of the UTF-8-encoded name.
+		// Followed by a null terminator.
+		// Followed by [0-3] zero bytes to align to a 4-byte boundary.
+	};
 }
 
 namespace D3D12FrameWork{
@@ -243,16 +280,16 @@ namespace D3D12FrameWork{
 			hr = m_pContainerRefl->Load(compiledShaderBlob.Get());
 			//pdb名を取得
 			UINT32 debugNameIndex;
-			hr = m_pContainerRefl->FindFirstPartKind(hlsl::DFCC_ShaderDebugName, &debugNameIndex);
+			hr = m_pContainerRefl->FindFirstPartKind(DFCC_ShaderDebugName, &debugNameIndex);
 			ComPtr<IDxcBlob> pPdbName;
 			hr = m_pContainerRefl->GetPartContent(debugNameIndex, pPdbName.ReleaseAndGetAddressOf());
 			//デバッグ情報の取得
 			UINT32 debugInfoIndex;
-			hr = m_pContainerRefl->FindFirstPartKind(hlsl::DFCC_ShaderDebugInfoDXIL, &debugInfoIndex);
+			hr = m_pContainerRefl->FindFirstPartKind(DFCC_ShaderDebugInfoDXIL, &debugInfoIndex);
 			ComPtr<IDxcBlob> pPdb;
 			hr = m_pContainerRefl->GetPartContent(debugInfoIndex, pPdb.ReleaseAndGetAddressOf());
 			//pdbファイル名の変換
-			auto pDebugNameData = reinterpret_cast<hlsl::DxilShaderDebugName const*>(
+			auto pDebugNameData = reinterpret_cast<DxilShaderDebugName const*>(
 				pPdbName->GetBufferPointer());
 			auto pName = reinterpret_cast<char const*>(pDebugNameData + 1);
 			
