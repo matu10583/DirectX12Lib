@@ -1,0 +1,6 @@
+[submodule "External/DirectXTex"]
+	path = External/DirectXTex
+	url = https://github.com/microsoft/DirectXTex.git
+[submodule "External/stb"]
+	path = External/stb
+	url = https://github.com/nothings/stb.git
