@@ -15,12 +15,8 @@
     - 試してないけど多分できる
 - fbx読み込み機能
 
-# 使ってる外部の機能
+# 実行に必要なもの
 
-## DirectXTex
-
-- テクスチャのミップマップ作製とかに使ってる
-
-# stb
-
-- pngの読み込み
+- /External/DirectXShaderCompiler内にdxcのライブラリを配置
+ - [Release](https://github.com/microsoft/DirectXShaderCompiler/releases)(2024_03_22)
+- ルートディレクトリにresフォルダを配置（僕のGoogleDriveにsvnがあるよ）
